@@ -63,7 +63,7 @@
                     </descriptorRefs>
                     <archive>
                         <manifest>
-                            <mainClass>Application</mainClass>
+                            <mainClass>com.bhe.measurement.server.Application</mainClass>
                         </manifest>
                     </archive>
                 </configuration>

@@ -1,3 +1,5 @@
+package com.bhe.measurement.server;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Data;
 
