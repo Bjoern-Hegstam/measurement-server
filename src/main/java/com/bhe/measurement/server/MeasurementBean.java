@@ -10,7 +10,7 @@ class MeasurementBean {
     private String source;
     private long timestampMillis;
     private String type;
-    private String value;
+    private double value;
     private String unit;
 
     static MeasurementBean fromJson(String json) {

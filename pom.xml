@@ -11,6 +11,10 @@
     <properties>
         <java.version>1.8</java.version>
 
+        <db.url>${env.DB_URL}</db.url> <!-- e.g. jdbc:postgresql://[host]/[database] -->
+        <db.user>${env.DB_USER}</db.user>
+        <db.password>${env.DB_PASSWORD}</db.password>
+
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
 
@@ -43,10 +47,30 @@
             <artifactId>jackson-databind</artifactId>
             <version>2.8.9</version>
         </dependency>
+
+
+        <!-- Database driver -->
+        <dependency>
+            <groupId>postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>9.1-901-1.jdbc4</version>
+        </dependency>
     </dependencies>
 
     <build>
         <plugins>
+            <!-- Database migrations -->
+            <plugin>
+                <groupId>org.flywaydb</groupId>
+                <artifactId>flyway-maven-plugin</artifactId>
+                <version>4.2.0</version>
+                <configuration>
+                    <url>${db.url}</url>
+                    <user>${db.user}</user>
+                    <password>${db.password}</password>
+                </configuration>
+            </plugin>
+
             <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
                 <executions>
