@@ -1,0 +1,2 @@
+#* @implicitly included *#
+#* @vtlvariable name="measurements" type="java.util.List<com.bhe.measurement.server.MeasurementBean>" *#

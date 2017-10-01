@@ -6,7 +6,7 @@ import lombok.Data;
 import java.io.IOException;
 
 @Data
-class MeasurementBean {
+public class MeasurementBean {
     private String source;
     private long timestampMillis;
     private String type;
