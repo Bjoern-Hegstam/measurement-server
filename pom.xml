@@ -21,19 +21,18 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
-    <dependencies>
-        <!--Project is based on the spark framework -->
-        <dependency>
-            <groupId>com.sparkjava</groupId>
-            <artifactId>spark-core</artifactId>
-            <version>2.6.0</version>
-        </dependency>
+    <repositories>
+        <repository>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
+        </repository>
+    </repositories>
 
-        <!-- Required by Spark. Error is given if slf4j is not explicitly included -->
+    <dependencies>
         <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-simple</artifactId>
-            <version>1.7.25</version>
+            <groupId>com.github.Bjoern-Hegstam</groupId>
+            <artifactId>web-util</artifactId>
+            <version>1.0</version>
         </dependency>
 
         <dependency>
@@ -42,12 +41,12 @@
             <version>1.16.18</version>
         </dependency>
 
+        <!-- Dependency injection framework -->
         <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-databind</artifactId>
-            <version>2.8.9</version>
+            <groupId>com.google.inject</groupId>
+            <artifactId>guice</artifactId>
+            <version>4.1.0</version>
         </dependency>
-
 
         <!-- Database driver -->
         <dependency>
