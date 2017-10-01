@@ -1,6 +1,5 @@
 package com.bhe.measurement.server;
 
-import com.bhe.measurement.server.db.DatabaseConfiguration;
 import com.bhe.web.util.JsonResponseTransformer;
 import com.github.bhe.webutil.webapp.Controller;
 import com.google.inject.Inject;
@@ -9,18 +8,17 @@ import spark.Request;
 import spark.Response;
 import spark.Service;
 
-import java.sql.*;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Consumer;
 
 public class MeasurementApiController implements Controller {
-    private final DatabaseConfiguration dbConf;
+
+    private final MeasurementRepository measurementRepository;
 
     @Inject
-    public MeasurementApiController(DatabaseConfiguration dbConf) {
-        this.dbConf = dbConf;
+    public MeasurementApiController(MeasurementRepository measurementRepository) {
+        this.measurementRepository = measurementRepository;
+        ;
     }
 
     @Override
@@ -31,70 +29,17 @@ public class MeasurementApiController implements Controller {
 
 
     private List<MeasurementBean> getMeasurements(Request request, Response response) {
-        // TODO: Extract repository for measurements
-        String query = "select id, source, timestamp, type, value, unit from measurement";
-
-        List<MeasurementBean> measurements = new ArrayList<>();
-
-        withConnection(conn -> {
-            try (Statement statement = conn.createStatement()) {
-                ResultSet rs = statement.executeQuery(query);
-                while (rs.next()) {
-                    MeasurementBean bean = new MeasurementBean();
-                    bean.setSource(rs.getString(2));
-                    bean.setTimestampMillis(rs.getTimestamp(3).getTime());
-                    bean.setType(rs.getString(4));
-                    bean.setValue(rs.getDouble(5));
-                    bean.setUnit(rs.getString(6));
-                    measurements.add(bean);
-                }
-            } catch (SQLException e) {
-                System.out.println("Error when creating statement");
-                e.printStackTrace();
-            }
-        });
-
-
-        return measurements;
+        return measurementRepository.getAll();
     }
 
     private MeasurementBean postMeasurement(Request request, Response response) {
         MeasurementBean measurement = MeasurementBean.fromJson(request.body());
+        MeasurementBean newMeasurement = measurementRepository.create(measurement);
+
         System.out.println("Inserting measurement");
-
-        String insertString = "insert into measurement (source, timestamp, type, value, unit) " +
-                "values (?, ?, ?, ?, ?)";
-
-        withConnection(conn -> {
-            try (PreparedStatement insertMeasurement = conn.prepareStatement(insertString)) {
-                insertMeasurement.setString(1, measurement.getSource());
-                insertMeasurement.setTimestamp(2, new Timestamp(measurement.getTimestampMillis()));
-                insertMeasurement.setString(3, measurement.getType());
-                insertMeasurement.setDouble(4, measurement.getValue());
-                insertMeasurement.setString(5, measurement.getUnit());
-                insertMeasurement.executeUpdate();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        });
-
-        System.out.println(LocalDateTime.now() + ": " + measurement.toString());
+        System.out.println(LocalDateTime.now() + ": " + newMeasurement.toString());
         response.type("application/json");
         response.status(HttpStatus.OK_200);
-        return measurement;
-    }
-
-    private void withConnection(Consumer<Connection> consumer) {
-        try (Connection conn = DriverManager.getConnection(
-                dbConf.getUrl(),
-                dbConf.getUser(),
-                dbConf.getPassword()
-        )) {
-            System.out.println("Connected to database");
-            consumer.accept(conn);
-        } catch (SQLException e) {
-            System.out.println("Failed to connect to database");
-            e.printStackTrace();
-        }
+        return newMeasurement;
     }
 }
