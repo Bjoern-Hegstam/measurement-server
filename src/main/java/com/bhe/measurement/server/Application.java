@@ -1,12 +1,12 @@
 package com.bhe.measurement.server;
 
 import com.bhe.measurement.server.conf.ConfigurationModule;
-import com.github.bhe.webutil.webapp.ApplicationBase;
+import com.bhe.webutil.webapp.ApplicationBase;
 import com.google.inject.Guice;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
-import spark.Service;
 
+import spark.Service;
 import java.util.Optional;
 
 import static java.util.Collections.singletonList;

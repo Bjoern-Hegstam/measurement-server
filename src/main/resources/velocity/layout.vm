@@ -1,0 +1,13 @@
+#macro(mainLayout)
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Plant monitor</title>
+</head>
+<body>
+
+$bodyContent
+
+</body>
+</html>
+#end

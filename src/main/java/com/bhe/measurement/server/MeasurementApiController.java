@@ -1,7 +1,7 @@
 package com.bhe.measurement.server;
 
 import com.bhe.web.util.JsonResponseTransformer;
-import com.github.bhe.webutil.webapp.Controller;
+import com.bhe.webutil.webapp.Controller;
 import com.google.inject.Inject;
 import org.eclipse.jetty.http.HttpStatus;
 import spark.Request;
@@ -18,13 +18,12 @@ public class MeasurementApiController implements Controller {
     @Inject
     public MeasurementApiController(MeasurementRepository measurementRepository) {
         this.measurementRepository = measurementRepository;
-        ;
     }
 
     @Override
     public void configureRoutes(Service http) {
-        http.get("/measurement", "application/json", this::getMeasurements, new JsonResponseTransformer());
-        http.post("/measurement", "application/json", this::postMeasurement, new JsonResponseTransformer());
+        http.get(Path.Api.MEASUREMENT, AcceptType.APPLICATION_JSON, this::getMeasurements, new JsonResponseTransformer());
+        http.post(Path.Api.MEASUREMENT, AcceptType.APPLICATION_JSON, this::postMeasurement, new JsonResponseTransformer());
     }
 
 
@@ -38,7 +37,7 @@ public class MeasurementApiController implements Controller {
 
         System.out.println("Inserting measurement");
         System.out.println(LocalDateTime.now() + ": " + newMeasurement.toString());
-        response.type("application/json");
+        response.type(AcceptType.APPLICATION_JSON);
         response.status(HttpStatus.OK_200);
         return newMeasurement;
     }

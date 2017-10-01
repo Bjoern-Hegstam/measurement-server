@@ -1,12 +1,12 @@
 package com.bhe.measurement.server;
 
-import com.github.bhe.webutil.webapp.Controller;
-import com.github.bhe.webutil.webapp.Request;
-import com.github.bhe.webutil.webapp.Result;
+import com.bhe.webutil.webapp.Controller;
+import com.bhe.webutil.webapp.Request;
+import com.bhe.webutil.webapp.Result;
 import spark.Service;
 
-import static com.github.bhe.webutil.webapp.ResultBuilder.result;
-import static com.github.bhe.webutil.webapp.SparkWrappers.asSparkRoute;
+import static com.bhe.webutil.webapp.ResultBuilder.result;
+import static com.bhe.webutil.webapp.SparkWrappers.asSparkRoute;
 
 public class IndexController implements Controller {
     @Override
