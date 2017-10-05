@@ -32,7 +32,8 @@ public class Application extends ApplicationBase {
     ) {
         super(
                 singletonList(indexController),
-                singletonList(measurementApiController)
+                singletonList(measurementApiController),
+                false
         );
     }
 
