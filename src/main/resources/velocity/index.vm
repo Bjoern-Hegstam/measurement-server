@@ -1,23 +1,6 @@
 #parse("/velocity/layout.vm")
-#@mainLayout()
-    <h3>Measurements</h3>
-    <table border="1">
-        <thead>
-            <td>Source</td>
-            <td>Type</td>
-            <td>Value</td>
-            <td>Unit</td>
-            <td>Timestamp</td>
-        </thead>
-    #foreach($measurement in $measurements)
-        <tr>
-            <td>$measurement.source</td>
-            <td>$measurement.type</td>
-            <td>$measurement.value</td>
-            <td>$measurement.unit</td>
-            <td>$measurement.timestampMillis</td>
-        </tr>
-    #end
-    </table>
+#@mainLayout("app/index/dashboard")
+    <div id="dashboard-container">
+    </div>
 
 #end

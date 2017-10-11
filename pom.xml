@@ -71,6 +71,28 @@
 
     <build>
         <plugins>
+            <!-- Automatically convert less to css -->
+            <plugin>
+                <groupId>biz.gabrys.maven.plugins</groupId>
+                <artifactId>lesscss-maven-plugin</artifactId>
+                <version>1.2.1</version>
+                <configuration>
+                    <sourceDirectory>${project.build.resources[0].directory}/public/less</sourceDirectory>
+                    <outputDirectory>${project.build.outputDirectory}/public/css</outputDirectory>
+                    <compress>false</compress>
+                    <force>true</force>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>default-compile</id>
+                        <phase>process-resources</phase>
+                        <goals>
+                            <goal>compile</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
             <!-- Database migrations -->
             <plugin>
                 <groupId>org.flywaydb</groupId>

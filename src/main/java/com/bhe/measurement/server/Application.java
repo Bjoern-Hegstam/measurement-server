@@ -42,6 +42,9 @@ public class Application extends ApplicationBase {
     @Override
     protected void configureServer(Service http) {
         http.port(getPort());
+
+        http.staticFiles.location("/public");
+        http.staticFiles.expireTime(600);
     }
 
     private int getPort() {
