@@ -1,4 +1,4 @@
-package com.bhe.measurement.server;
+package com.bhe.measurement.server.measurement;
 
 import com.bhe.measurement.server.db.DatabaseConfiguration;
 import com.google.inject.Inject;

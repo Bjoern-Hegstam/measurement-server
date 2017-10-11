@@ -1,4 +1,4 @@
-package com.bhe.web.util;
+package com.bhe.measurement.server.util;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;

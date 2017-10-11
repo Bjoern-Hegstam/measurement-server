@@ -1,5 +1,8 @@
-package com.bhe.measurement.server;
+package com.bhe.measurement.server.index;
 
+import com.bhe.measurement.server.measurement.MeasurementBean;
+import com.bhe.measurement.server.measurement.MeasurementRepository;
+import com.bhe.measurement.server.util.Path;
 import com.bhe.webutil.webapp.Controller;
 import com.bhe.webutil.webapp.Request;
 import com.bhe.webutil.webapp.Result;
@@ -23,10 +26,10 @@ public class IndexController implements Controller {
 
     @Override
     public void configureRoutes(Service http) {
-        http.get(Path.Web.INDEX, asSparkRoute(this::getFrontPage));
+        http.get(Path.Web.INDEX, asSparkRoute(this::getIndexPage));
     }
 
-    private Result getFrontPage(Request request) {
+    private Result getIndexPage(Request request) {
         List<MeasurementBean> measurements = measurementRepository.getAll();
 
         Map<String, Object> model = new HashMap<>();

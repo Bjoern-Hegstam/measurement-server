@@ -1,4 +1,4 @@
-package com.bhe.measurement.server;
+package com.bhe.measurement.server.util;
 
 public class Path {
     public static class Web {

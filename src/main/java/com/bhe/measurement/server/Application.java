@@ -1,6 +1,8 @@
 package com.bhe.measurement.server;
 
 import com.bhe.measurement.server.conf.ConfigurationModule;
+import com.bhe.measurement.server.index.IndexController;
+import com.bhe.measurement.server.measurement.MeasurementApiController;
 import com.bhe.webutil.webapp.ApplicationBase;
 import com.google.inject.Guice;
 import com.google.inject.Inject;
