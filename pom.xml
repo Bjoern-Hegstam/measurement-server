@@ -32,7 +32,7 @@
         <dependency>
             <groupId>com.github.Bjoern-Hegstam</groupId>
             <artifactId>web-util</artifactId>
-            <version>2.1</version>
+            <version>3.0</version>
         </dependency>
 
         <dependency>
@@ -121,7 +121,7 @@
                     </descriptorRefs>
                     <archive>
                         <manifest>
-                            <mainClass>com.bhe.measurement.server.Application</mainClass>
+                            <mainClass>com.bhegstam.measurement.server.Application</mainClass>
                         </manifest>
                     </archive>
                 </configuration>

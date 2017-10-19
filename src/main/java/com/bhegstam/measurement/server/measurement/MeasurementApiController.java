@@ -1,9 +1,9 @@
-package com.bhe.measurement.server.measurement;
+package com.bhegstam.measurement.server.measurement;
 
-import com.bhe.measurement.server.util.AcceptType;
-import com.bhe.measurement.server.util.Path;
-import com.bhe.measurement.server.util.JsonResponseTransformer;
-import com.bhe.webutil.webapp.Controller;
+import com.bhegstam.measurement.server.util.AcceptType;
+import com.bhegstam.measurement.server.util.Path;
+import com.bhegstam.measurement.server.util.JsonResponseTransformer;
+import com.bhegstam.webutil.webapp.Controller;
 import com.google.inject.Inject;
 import org.eclipse.jetty.http.HttpStatus;
 import spark.Request;

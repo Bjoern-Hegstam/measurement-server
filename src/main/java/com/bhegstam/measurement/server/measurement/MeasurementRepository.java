@@ -1,6 +1,6 @@
-package com.bhe.measurement.server.measurement;
+package com.bhegstam.measurement.server.measurement;
 
-import com.bhe.measurement.server.db.DatabaseConfiguration;
+import com.bhegstam.measurement.server.db.DatabaseConfiguration;
 import com.google.inject.Inject;
 
 import java.sql.*;

@@ -1,4 +1,4 @@
-package com.bhe.measurement.server.measurement;
+package com.bhegstam.measurement.server.measurement;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Data;

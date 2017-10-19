@@ -1,4 +1,4 @@
-package com.bhe.measurement.server.db;
+package com.bhegstam.measurement.server.db;
 
 import lombok.Getter;
 
