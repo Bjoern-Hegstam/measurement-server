@@ -11,7 +11,7 @@ define(['jquery', 'app/db/measurement'], function ($, db) {
         Attribute('Source', 'source', 'string'),
         Attribute('Type', 'type', 'string'),
         Attribute('Value', 'value', 'numeric'),
-        Attribute('Timestamp (ms)', 'timestampMillis', 'numeric')
+        Attribute('Created at', 'createdAt', 'timestamp')
     ];
 
     db.getMeasurements()
@@ -34,7 +34,12 @@ define(['jquery', 'app/db/measurement'], function ($, db) {
                 var row = document.createElement('tr');
                 MeasurementAttributes.forEach(function (a) {
                     var td = document.createElement('td');
-                    td.innerText = measurement[a.dataName];
+
+                    if (a.dataType === 'timestamp') {
+                        td.innerText = new Date(measurement[a.dataName]*1000) // Convert s to ms
+                    } else {
+                        td.innerText = measurement[a.dataName];
+                    }
                     td.classList.add(a.dataType);
                     row.appendChild(td);
                 });

@@ -4,6 +4,7 @@ import com.bhegstam.measurement.server.db.DatabaseConfiguration;
 import com.google.inject.Inject;
 
 import java.sql.*;
+import java.time.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
@@ -27,7 +28,7 @@ public class MeasurementRepository {
                 while (rs.next()) {
                     MeasurementBean bean = new MeasurementBean();
                     bean.setSource(rs.getString(2));
-                    bean.setTimestampMillis(rs.getTimestamp(3).getTime());
+                    bean.setCreatedAt(Instant.ofEpochMilli(rs.getTimestamp(3).getTime()));
                     bean.setType(rs.getString(4));
                     bean.setValue(rs.getDouble(5));
                     bean.setUnit(rs.getString(6));
@@ -51,7 +52,7 @@ public class MeasurementRepository {
         withConnection(conn -> {
             try (PreparedStatement insertMeasurement = conn.prepareStatement(insertString)) {
                 insertMeasurement.setString(1, measurement.getSource());
-                insertMeasurement.setTimestamp(2, new Timestamp(measurement.getTimestampMillis()));
+                insertMeasurement.setTimestamp(2, new Timestamp(measurement.getCreatedAt().toEpochMilli()));
                 insertMeasurement.setString(3, measurement.getType());
                 insertMeasurement.setDouble(4, measurement.getValue());
                 insertMeasurement.setString(5, measurement.getUnit());
