@@ -36,7 +36,8 @@ define(['jquery', 'app/db/measurement'], function ($, db) {
                     var td = document.createElement('td');
 
                     if (a.dataType === 'timestamp') {
-                        td.innerText = new Date(measurement[a.dataName]*1000) // Convert s to ms
+                        var date = new Date(measurement[a.dataName]*1000); // Convert s to ms
+                        td.innerText = date.toISOString();
                     } else {
                         td.innerText = measurement[a.dataName];
                     }
