@@ -37,6 +37,7 @@ public class MeasurementApiController implements Controller {
 
     private MeasurementBean postMeasurement(Request request, Response response) {
         MeasurementBean measurement = MeasurementBean.fromJson(request.body());
+        measurement.setCreatedAtMillis(System.currentTimeMillis());
 
         DbMeasurementBean newMeasurement = measurementRepository.create(measurement.toDbBean());
 
