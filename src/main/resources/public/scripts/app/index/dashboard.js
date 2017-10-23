@@ -36,8 +36,10 @@ define(['jquery', 'app/db/measurement'], function ($, db) {
                     var td = document.createElement('td');
 
                     if (a.dataType === 'timestamp') {
-                        var date = new Date(measurement[a.dataName]*1000); // Convert s to ms
-                        td.innerText = date.toISOString();
+                        var currentDate = new Date();
+                        var timestamp = new Date(measurement[a.dataName]*1000); // Convert s to ms
+                        var localTimestamp = new Date(timestamp.getTime() - currentDate.getTimezoneOffset() * 60000); // Convert min to ms
+                        td.innerText = localTimestamp.toISOString();
                     } else {
                         td.innerText = measurement[a.dataName];
                     }
