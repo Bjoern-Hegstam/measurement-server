@@ -18,7 +18,7 @@ public class MeasurementRepository {
     }
 
     public List<DbMeasurementBean> getAll() {
-        String query = "select id, source, timestamp, type, value, unit from measurement";
+        String query = "select id, source, timestamp, type, value, unit from measurement order by timestamp desc";
 
         List<DbMeasurementBean> measurements = new ArrayList<>();
 
@@ -40,7 +40,6 @@ public class MeasurementRepository {
                 e.printStackTrace();
             }
         });
-
 
         return measurements;
     }
