@@ -1,12 +1,10 @@
 package com.bhegstam.measurement.server.measurement;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.Data;
 
 import java.io.IOException;
 import java.time.Instant;
 
-@Data
 public class MeasurementBean {
     private String source;
     private Instant createdAt;
@@ -22,5 +20,45 @@ public class MeasurementBean {
         } catch (IOException e) {
             throw new IllegalArgumentException(e);
         }
+    }
+
+    public String getSource() {
+        return source;
+    }
+
+    public void setSource(String source) {
+        this.source = source;
+    }
+
+    public Instant getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Instant createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public double getValue() {
+        return value;
+    }
+
+    public void setValue(double value) {
+        this.value = value;
+    }
+
+    public String getUnit() {
+        return unit;
+    }
+
+    public void setUnit(String unit) {
+        this.unit = unit;
     }
 }

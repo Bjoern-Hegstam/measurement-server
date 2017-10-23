@@ -1,10 +1,7 @@
 package com.bhegstam.measurement.server.db;
 
-import lombok.Getter;
-
 import java.util.Objects;
 
-@Getter
 public class DatabaseConfiguration {
     private final String url;
     private final String user;
@@ -22,5 +19,17 @@ public class DatabaseConfiguration {
                 System.getenv("DB_USER"),
                 System.getenv("DB_PASSWORD")
         );
+    }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public String getUser() {
+        return user;
+    }
+
+    public String getPassword() {
+        return password;
     }
 }
