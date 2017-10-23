@@ -1,26 +1,13 @@
-package com.bhegstam.measurement.server.measurement;
+package com.bhegstam.measurement.server.measurement.db;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import java.io.IOException;
 import java.time.Instant;
 
-public class MeasurementBean {
+public class DbMeasurementBean {
     private String source;
     private Instant createdAt;
     private String type;
     private double value;
     private String unit;
-
-    static MeasurementBean fromJson(String json) {
-        try {
-            return new ObjectMapper()
-                    .findAndRegisterModules()
-                    .readValue(json, MeasurementBean.class);
-        } catch (IOException e) {
-            throw new IllegalArgumentException(e);
-        }
-    }
 
     public String getSource() {
         return source;

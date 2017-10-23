@@ -2,7 +2,7 @@ package com.bhegstam.measurement.server;
 
 import com.bhegstam.measurement.server.conf.ConfigurationModule;
 import com.bhegstam.measurement.server.index.IndexController;
-import com.bhegstam.measurement.server.measurement.MeasurementApiController;
+import com.bhegstam.measurement.server.measurement.api.MeasurementApiController;
 import com.bhegstam.webutil.webapp.ApplicationBase;
 import com.google.inject.Guice;
 import com.google.inject.Inject;

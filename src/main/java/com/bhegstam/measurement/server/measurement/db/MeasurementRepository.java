@@ -1,4 +1,4 @@
-package com.bhegstam.measurement.server.measurement;
+package com.bhegstam.measurement.server.measurement.db;
 
 import com.bhegstam.measurement.server.db.DatabaseConfiguration;
 import com.google.inject.Inject;
@@ -17,16 +17,16 @@ public class MeasurementRepository {
         this.dbConf = dbConf;
     }
 
-    public List<MeasurementBean> getAll() {
+    public List<DbMeasurementBean> getAll() {
         String query = "select id, source, timestamp, type, value, unit from measurement";
 
-        List<MeasurementBean> measurements = new ArrayList<>();
+        List<DbMeasurementBean> measurements = new ArrayList<>();
 
         withConnection(conn -> {
             try (Statement statement = conn.createStatement()) {
                 ResultSet rs = statement.executeQuery(query);
                 while (rs.next()) {
-                    MeasurementBean bean = new MeasurementBean();
+                    DbMeasurementBean bean = new DbMeasurementBean();
                     bean.setSource(rs.getString(2));
                     bean.setCreatedAt(Instant.ofEpochMilli(rs.getTimestamp(3).getTime()));
                     bean.setType(rs.getString(4));
@@ -45,7 +45,7 @@ public class MeasurementRepository {
         return measurements;
     }
 
-    public MeasurementBean create(MeasurementBean measurement) {
+    public DbMeasurementBean create(DbMeasurementBean measurement) {
         String insertString = "insert into measurement (source, timestamp, type, value, unit) " +
                 "values (?, ?, ?, ?, ?)";
 

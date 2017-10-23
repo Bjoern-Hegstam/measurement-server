@@ -1,5 +1,7 @@
-package com.bhegstam.measurement.server.measurement;
+package com.bhegstam.measurement.server.measurement.api;
 
+import com.bhegstam.measurement.server.measurement.db.DbMeasurementBean;
+import com.bhegstam.measurement.server.measurement.db.MeasurementRepository;
 import com.bhegstam.measurement.server.util.AcceptType;
 import com.bhegstam.measurement.server.util.Path;
 import com.bhegstam.measurement.server.util.JsonResponseTransformer;
@@ -29,18 +31,19 @@ public class MeasurementApiController implements Controller {
     }
 
 
-    private List<MeasurementBean> getMeasurements(Request request, Response response) {
+    private List<DbMeasurementBean> getMeasurements(Request request, Response response) {
         return measurementRepository.getAll();
     }
 
     private MeasurementBean postMeasurement(Request request, Response response) {
         MeasurementBean measurement = MeasurementBean.fromJson(request.body());
-        MeasurementBean newMeasurement = measurementRepository.create(measurement);
+
+        DbMeasurementBean newMeasurement = measurementRepository.create(measurement.toDbBean());
 
         System.out.println("Inserting measurement");
         System.out.println(LocalDateTime.now() + ": " + newMeasurement.toString());
         response.type(AcceptType.APPLICATION_JSON);
         response.status(HttpStatus.OK_200);
-        return newMeasurement;
+        return MeasurementBean.fromDbBean(newMeasurement);
     }
 }
