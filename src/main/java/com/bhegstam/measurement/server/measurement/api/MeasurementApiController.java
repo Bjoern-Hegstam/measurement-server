@@ -15,6 +15,8 @@ import spark.Service;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import static java.util.stream.Collectors.toList;
+
 public class MeasurementApiController implements Controller {
 
     private final MeasurementRepository measurementRepository;
@@ -31,8 +33,16 @@ public class MeasurementApiController implements Controller {
     }
 
 
-    private List<DbMeasurementBean> getMeasurements(Request request, Response response) {
-        return measurementRepository.getAll();
+    private List<MeasurementBean> getMeasurements(Request request, Response response) {
+        List<MeasurementBean> measurements = measurementRepository
+                .getAll().stream()
+                .map(MeasurementBean::fromDbBean)
+                .collect(toList());
+
+        response.type(AcceptType.APPLICATION_JSON);
+        response.status(HttpStatus.OK_200);
+
+        return measurements;
     }
 
     private MeasurementBean postMeasurement(Request request, Response response) {

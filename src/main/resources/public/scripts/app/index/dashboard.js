@@ -11,7 +11,7 @@ define(['jquery', 'app/db/measurement'], function ($, db) {
         Attribute('Source', 'source', 'string'),
         Attribute('Type', 'type', 'string'),
         Attribute('Value', 'value', 'numeric'),
-        Attribute('Created at', 'createdAt', 'timestamp')
+        Attribute('Created at', 'createdAtMillis', 'timestamp')
     ];
 
     db.getMeasurements()
@@ -37,7 +37,7 @@ define(['jquery', 'app/db/measurement'], function ($, db) {
 
                     if (a.dataType === 'timestamp') {
                         var currentDate = new Date();
-                        var timestamp = new Date(measurement[a.dataName]*1000); // Convert s to ms
+                        var timestamp = new Date(measurement[a.dataName]);
                         var localTimestamp = new Date(timestamp.getTime() - currentDate.getTimezoneOffset() * 60000); // Convert min to ms
                         td.innerText = localTimestamp.toISOString();
                     } else {
