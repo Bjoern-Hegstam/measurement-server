@@ -51,8 +51,6 @@ public class MeasurementApiController implements Controller {
 
         DbMeasurementBean newMeasurement = measurementRepository.create(measurement.toDbBean());
 
-        System.out.println("Inserting measurement");
-        System.out.println(LocalDateTime.now() + ": " + newMeasurement.toString());
         response.type(AcceptType.APPLICATION_JSON);
         response.status(HttpStatus.OK_200);
         return MeasurementBean.fromDbBean(newMeasurement);

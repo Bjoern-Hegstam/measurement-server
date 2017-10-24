@@ -36,7 +36,6 @@ public class MeasurementRepository {
                 }
             } catch (SQLException e) {
                 System.out.println("Error when creating statement");
-                // TODO: Better error handling
                 e.printStackTrace();
             }
         });
@@ -74,7 +73,6 @@ public class MeasurementRepository {
             consumer.accept(conn);
         } catch (SQLException e) {
             System.out.println("Failed to connect to database");
-            // TODO: Better error handling
             e.printStackTrace();
         }
     }
