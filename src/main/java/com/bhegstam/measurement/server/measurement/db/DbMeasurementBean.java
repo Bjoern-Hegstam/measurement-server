@@ -48,4 +48,15 @@ public class DbMeasurementBean {
     public void setUnit(String unit) {
         this.unit = unit;
     }
+
+    @Override
+    public String toString() {
+        return "DbMeasurementBean{" +
+                "source='" + source + '\'' +
+                ", createdAt=" + createdAt +
+                ", type='" + type + '\'' +
+                ", value=" + value +
+                ", unit='" + unit + '\'' +
+                '}';
+    }
 }

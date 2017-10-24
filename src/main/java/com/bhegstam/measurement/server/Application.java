@@ -2,6 +2,7 @@ package com.bhegstam.measurement.server;
 
 import com.bhegstam.measurement.server.conf.ConfigurationModule;
 import com.bhegstam.measurement.server.index.IndexController;
+import com.bhegstam.measurement.server.logging.LoggingModule;
 import com.bhegstam.measurement.server.measurement.api.MeasurementApiController;
 import com.bhegstam.webutil.webapp.ApplicationBase;
 import com.google.inject.Guice;
@@ -19,6 +20,7 @@ public class Application extends ApplicationBase {
 
     public static void main(String[] args) {
         Injector injector = Guice.createInjector(
+                new LoggingModule(),
                 new ConfigurationModule()
         );
 

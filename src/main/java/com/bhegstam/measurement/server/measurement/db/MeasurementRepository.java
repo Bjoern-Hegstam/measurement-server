@@ -1,7 +1,9 @@
 package com.bhegstam.measurement.server.measurement.db;
 
 import com.bhegstam.measurement.server.db.DatabaseConfiguration;
+import com.bhegstam.measurement.server.logging.InjectLogger;
 import com.google.inject.Inject;
+import org.apache.logging.log4j.Logger;
 
 import java.sql.*;
 import java.time.*;
@@ -10,6 +12,9 @@ import java.util.List;
 import java.util.function.Consumer;
 
 public class MeasurementRepository {
+    @InjectLogger
+    private Logger logger;
+
     private final DatabaseConfiguration dbConf;
 
     @Inject
@@ -18,6 +23,8 @@ public class MeasurementRepository {
     }
 
     public List<DbMeasurementBean> getAll() {
+        logger.debug("Getting measurements");
+
         String query = "select id, source, timestamp, type, value, unit from measurement order by timestamp desc";
 
         List<DbMeasurementBean> measurements = new ArrayList<>();
@@ -25,7 +32,7 @@ public class MeasurementRepository {
         withConnection(conn -> {
             try (Statement statement = conn.createStatement()) {
                 ResultSet rs = statement.executeQuery(query);
-                while (rs.next()) {
+                 while (rs.next()) {
                     DbMeasurementBean bean = new DbMeasurementBean();
                     bean.setSource(rs.getString(2));
                     bean.setCreatedAt(Instant.ofEpochMilli(rs.getTimestamp(3).getTime()));
@@ -35,8 +42,7 @@ public class MeasurementRepository {
                     measurements.add(bean);
                 }
             } catch (SQLException e) {
-                System.out.println("Error when creating statement");
-                e.printStackTrace();
+                logger.error("Error when creating statement", e);
             }
         });
 
@@ -44,6 +50,9 @@ public class MeasurementRepository {
     }
 
     public DbMeasurementBean create(DbMeasurementBean measurement) {
+        logger.debug("Creating measurement");
+        logger.debug(measurement);
+
         String insertString = "insert into measurement (source, timestamp, type, value, unit) " +
                 "values (?, ?, ?, ?, ?)";
 
@@ -56,7 +65,7 @@ public class MeasurementRepository {
                 insertMeasurement.setString(5, measurement.getUnit());
                 insertMeasurement.executeUpdate();
             } catch (SQLException e) {
-                e.printStackTrace();
+                logger.error("Error when creating insert statement", e);
             }
         });
 
@@ -69,11 +78,10 @@ public class MeasurementRepository {
                 dbConf.getUser(),
                 dbConf.getPassword()
         )) {
-            System.out.println("Connected to database");
+            logger.debug("Database connection established");
             consumer.accept(conn);
         } catch (SQLException e) {
-            System.out.println("Failed to connect to database");
-            e.printStackTrace();
+            logger.error("Failed to connect to database", e);
         }
     }
 }
