@@ -75,7 +75,7 @@ public class MeasurementBean {
 
     public static MeasurementBean fromDbBean(DbMeasurementBean dbBean) {
         MeasurementBean bean = new MeasurementBean();
-        bean.setSource(bean.getSource());
+        bean.setSource(dbBean.getSource());
         bean.setCreatedAtMillis(dbBean.getCreatedAt().toEpochMilli());
         bean.setType(dbBean.getType());
         bean.setValue(dbBean.getValue());
