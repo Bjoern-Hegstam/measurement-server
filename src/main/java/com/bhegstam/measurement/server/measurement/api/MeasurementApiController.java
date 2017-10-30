@@ -39,18 +39,18 @@ public class MeasurementApiController implements Controller {
     Result getMeasurements(Request request) {
         QueryResult<DbMeasurementBean> queryResult = measurementRepository.find(PaginationSettings.fromQuery(request));
 
-        List<MeasurementBean> measurements = queryResult
-                .getData().stream()
-                .map(MeasurementBean::fromDbBean)
-                .collect(toList());
-
         ResultBuilder resultBuilder = result();
 
         PaginationHeader.appendHeaders(resultBuilder, queryResult.getPaginationInformation());
 
         return resultBuilder
                 .type(AcceptType.APPLICATION_JSON)
-                .returnPayload(measurements);
+                .returnPayload(
+                        queryResult
+                                .getData().stream()
+                                .map(MeasurementBean::fromDbBean)
+                                .collect(toList())
+                );
     }
 
     Result postMeasurement(Request request) {
