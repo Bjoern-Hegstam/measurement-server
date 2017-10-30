@@ -33,7 +33,7 @@
         <dependency>
             <groupId>com.github.Bjoern-Hegstam</groupId>
             <artifactId>web-util</artifactId>
-            <version>3.0</version>
+            <version>3.1</version>
         </dependency>
 
         <dependency>

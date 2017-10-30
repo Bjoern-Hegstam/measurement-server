@@ -6,14 +6,15 @@ import com.bhegstam.measurement.server.util.AcceptType;
 import com.bhegstam.measurement.server.util.JsonResponseTransformer;
 import com.bhegstam.measurement.server.util.Path;
 import com.bhegstam.webutil.webapp.Controller;
+import com.bhegstam.webutil.webapp.Request;
+import com.bhegstam.webutil.webapp.Result;
 import com.google.inject.Inject;
-import org.eclipse.jetty.http.HttpStatus;
-import spark.Request;
-import spark.Response;
 import spark.Service;
 
 import java.util.List;
 
+import static com.bhegstam.webutil.webapp.ResultBuilder.result;
+import static com.bhegstam.webutil.webapp.SparkWrappers.asSparkRoute;
 import static java.util.stream.Collectors.toList;
 
 public class MeasurementApiController implements Controller {
@@ -27,31 +28,29 @@ public class MeasurementApiController implements Controller {
 
     @Override
     public void configureRoutes(Service http) {
-        http.get(Path.Api.MEASUREMENT, AcceptType.APPLICATION_JSON, this::getMeasurements, new JsonResponseTransformer());
-        http.post(Path.Api.MEASUREMENT, AcceptType.APPLICATION_JSON, this::postMeasurement, new JsonResponseTransformer());
+        http.get(Path.Api.MEASUREMENT, AcceptType.APPLICATION_JSON, asSparkRoute(this::getMeasurements), new JsonResponseTransformer());
+        http.post(Path.Api.MEASUREMENT, AcceptType.APPLICATION_JSON, asSparkRoute(this::postMeasurement), new JsonResponseTransformer());
     }
 
-
-    private List<MeasurementBean> getMeasurements(Request request, Response response) {
+    private Result getMeasurements(Request request) {
         List<MeasurementBean> measurements = measurementRepository
                 .getAll().stream()
                 .map(MeasurementBean::fromDbBean)
                 .collect(toList());
 
-        response.type(AcceptType.APPLICATION_JSON);
-        response.status(HttpStatus.OK_200);
-
-        return measurements;
+        return result()
+                .type(AcceptType.APPLICATION_JSON)
+                .returnPayload(measurements);
     }
 
-    private MeasurementBean postMeasurement(Request request, Response response) {
+    private Result postMeasurement(Request request) {
         MeasurementBean measurement = MeasurementBean.fromJson(request.body());
         measurement.setCreatedAtMillis(System.currentTimeMillis());
 
         DbMeasurementBean newMeasurement = measurementRepository.create(measurement.toDbBean());
 
-        response.type(AcceptType.APPLICATION_JSON);
-        response.status(HttpStatus.OK_200);
-        return MeasurementBean.fromDbBean(newMeasurement);
+        return result()
+                .type(AcceptType.APPLICATION_JSON)
+                .returnPayload(MeasurementBean.fromDbBean(newMeasurement));
     }
 }
