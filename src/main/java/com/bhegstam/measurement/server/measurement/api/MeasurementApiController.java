@@ -3,8 +3,8 @@ package com.bhegstam.measurement.server.measurement.api;
 import com.bhegstam.measurement.server.measurement.db.DbMeasurementBean;
 import com.bhegstam.measurement.server.measurement.db.MeasurementRepository;
 import com.bhegstam.measurement.server.util.AcceptType;
-import com.bhegstam.measurement.server.util.Path;
 import com.bhegstam.measurement.server.util.JsonResponseTransformer;
+import com.bhegstam.measurement.server.util.Path;
 import com.bhegstam.webutil.webapp.Controller;
 import com.google.inject.Inject;
 import org.eclipse.jetty.http.HttpStatus;
@@ -12,7 +12,6 @@ import spark.Request;
 import spark.Response;
 import spark.Service;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 import static java.util.stream.Collectors.toList;
