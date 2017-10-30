@@ -19,63 +19,56 @@ public class PaginationInformationTest {
     @Test
     public void calculate_lessThanOnePageOfItems() {
         testCalculation(
-                PER_PAGE - 1,
                 new PaginationSettings(PER_PAGE, 1),
-                new PaginationInformation(1, PER_PAGE, 1, null, null)
+                new PaginationInformation(PER_PAGE - 1, 1, PER_PAGE, 1, null, null)
         );
     }
 
     @Test
     public void calculate_exactlyOnePage() {
         testCalculation(
-                PER_PAGE,
                 new PaginationSettings(PER_PAGE, 1),
-                new PaginationInformation(1, PER_PAGE, 1, null, null)
+                new PaginationInformation(PER_PAGE, 1, PER_PAGE, 1, null, null)
         );
     }
 
     @Test
     public void calculate_firstPage_hasNextPage() {
         testCalculation(
-                PER_PAGE + 1,
                 new PaginationSettings(PER_PAGE, 1),
-                new PaginationInformation(2, PER_PAGE, 1, 2, null)
+                new PaginationInformation(PER_PAGE + 1, 2, PER_PAGE, 1, 2, null)
         );
     }
 
     @Test
     public void calculate_secondPage_oneLessThanThirdPage() {
         testCalculation(
-                2*PER_PAGE - 1,
                 new PaginationSettings(PER_PAGE, 2),
-                new PaginationInformation(2, PER_PAGE, 2, null, 1)
+                new PaginationInformation(2*PER_PAGE - 1, 2, PER_PAGE, 2, null, 1)
         );
     }
 
     @Test
     public void calculate_secondPage_exactly() {
         testCalculation(
-                2*PER_PAGE,
                 new PaginationSettings(PER_PAGE, 2),
-                new PaginationInformation(2, PER_PAGE, 2, null, 1)
+                new PaginationInformation(2*PER_PAGE, 2, PER_PAGE, 2, null, 1)
         );
     }
 
     @Test
     public void calculate_secondPage_hasNextPage() {
         testCalculation(
-                2*PER_PAGE + 1,
                 new PaginationSettings(PER_PAGE, 2),
-                new PaginationInformation(3, PER_PAGE, 2, 3, 1)
+                new PaginationInformation(2*PER_PAGE + 1, 3, PER_PAGE, 2, 3, 1)
         );
     }
 
     @Test
     public void calculate_zeroItems() {
         testCalculation(
-                0,
                 new PaginationSettings(PER_PAGE, 1),
-                new PaginationInformation(1, PER_PAGE, 1, null, null)
+                new PaginationInformation(0, 1, PER_PAGE, 1, null, null)
         );
     }
 
@@ -89,9 +82,9 @@ public class PaginationInformationTest {
         PaginationInformation.calculate(PER_PAGE, new PaginationSettings(0, 1));
     }
 
-    private void testCalculation(int itemCount, PaginationSettings settings, PaginationInformation expectedInformation) {
+    private void testCalculation(PaginationSettings settings, PaginationInformation expectedInformation) {
         // when
-        PaginationInformation calculated = PaginationInformation.calculate(itemCount, settings);
+        PaginationInformation calculated = PaginationInformation.calculate(expectedInformation.getTotalItemCount(), settings);
 
         // then
         errorCollector.checkThat("Page count", calculated.getPageCount(), is(expectedInformation.getPageCount()));
@@ -109,7 +102,7 @@ public class PaginationInformationTest {
 
     private void testOffset(String reason, int perPage, int page, int expectedOffset) {
         // given
-        PaginationInformation paginationInformation = new PaginationInformation(10, perPage, page, null, null);
+        PaginationInformation paginationInformation = new PaginationInformation(10*perPage, 10, perPage, page, null, null);
 
         // then
         errorCollector.checkThat(reason, paginationInformation.getOffset(), is(expectedOffset));

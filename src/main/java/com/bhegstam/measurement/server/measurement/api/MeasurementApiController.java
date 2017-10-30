@@ -1,14 +1,17 @@
 package com.bhegstam.measurement.server.measurement.api;
 
 import com.bhegstam.measurement.server.db.PaginationSettings;
+import com.bhegstam.measurement.server.db.QueryResult;
 import com.bhegstam.measurement.server.measurement.db.DbMeasurementBean;
 import com.bhegstam.measurement.server.measurement.db.MeasurementRepository;
 import com.bhegstam.measurement.server.util.AcceptType;
 import com.bhegstam.measurement.server.util.JsonResponseTransformer;
 import com.bhegstam.measurement.server.util.Path;
+import com.bhegstam.measurement.server.web.PaginationHeader;
 import com.bhegstam.webutil.webapp.Controller;
 import com.bhegstam.webutil.webapp.Request;
 import com.bhegstam.webutil.webapp.Result;
+import com.bhegstam.webutil.webapp.ResultBuilder;
 import com.google.inject.Inject;
 import spark.Service;
 
@@ -33,18 +36,24 @@ public class MeasurementApiController implements Controller {
         http.post(Path.Api.MEASUREMENT, AcceptType.APPLICATION_JSON, asSparkRoute(this::postMeasurement), new JsonResponseTransformer());
     }
 
-    private Result getMeasurements(Request request) {
-        List<MeasurementBean> measurements = measurementRepository
-                .find(PaginationSettings.fromQuery(request)).stream()
+    Result getMeasurements(Request request) {
+        QueryResult<DbMeasurementBean> queryResult = measurementRepository.find(PaginationSettings.fromQuery(request));
+
+        List<MeasurementBean> measurements = queryResult
+                .getData().stream()
                 .map(MeasurementBean::fromDbBean)
                 .collect(toList());
 
-        return result()
+        ResultBuilder resultBuilder = result();
+
+        PaginationHeader.appendHeaders(resultBuilder, queryResult.getPaginationInformation());
+
+        return resultBuilder
                 .type(AcceptType.APPLICATION_JSON)
                 .returnPayload(measurements);
     }
 
-    private Result postMeasurement(Request request) {
+    Result postMeasurement(Request request) {
         MeasurementBean measurement = MeasurementBean.fromJson(request.body());
         measurement.setCreatedAtMillis(System.currentTimeMillis());
 

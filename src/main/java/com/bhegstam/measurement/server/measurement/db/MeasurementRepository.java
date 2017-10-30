@@ -3,6 +3,7 @@ package com.bhegstam.measurement.server.measurement.db;
 import com.bhegstam.measurement.server.db.DatabaseConfiguration;
 import com.bhegstam.measurement.server.db.PaginationInformation;
 import com.bhegstam.measurement.server.db.PaginationSettings;
+import com.bhegstam.measurement.server.db.QueryResult;
 import com.bhegstam.measurement.server.logging.InjectLogger;
 import com.google.inject.Inject;
 import org.apache.logging.log4j.Logger;
@@ -24,11 +25,12 @@ public class MeasurementRepository {
         this.dbConf = dbConf;
     }
 
-    public List<DbMeasurementBean> find(PaginationSettings paginationSettings) {
+    public QueryResult<DbMeasurementBean> find(PaginationSettings paginationSettings) {
         logger.debug("Finding measurements");
 
 
         List<DbMeasurementBean> measurements = new ArrayList<>();
+        List<PaginationInformation> pageInfoContainer = new ArrayList<>();
 
         withConnection(conn -> {
             String totalCountQuery = "SELECT count(id) FROM measurement";
@@ -44,6 +46,7 @@ public class MeasurementRepository {
             }
 
             PaginationInformation paginationInformation = PaginationInformation.calculate(totalCount, paginationSettings);
+            pageInfoContainer.add(paginationInformation);
             logger.debug(paginationInformation);
 
             String query = "SELECT id, source, timestamp, type, value, unit " +
@@ -70,7 +73,7 @@ public class MeasurementRepository {
             }
         });
 
-        return measurements;
+        return new QueryResult<>(measurements, pageInfoContainer.get(0));
     }
 
     public DbMeasurementBean create(DbMeasurementBean measurement) {
