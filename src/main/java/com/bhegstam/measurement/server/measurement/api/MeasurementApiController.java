@@ -15,8 +15,6 @@ import com.bhegstam.webutil.webapp.ResultBuilder;
 import com.google.inject.Inject;
 import spark.Service;
 
-import java.util.List;
-
 import static com.bhegstam.webutil.webapp.ResultBuilder.result;
 import static com.bhegstam.webutil.webapp.SparkWrappers.asSparkRoute;
 import static java.util.stream.Collectors.toList;
@@ -33,11 +31,31 @@ public class MeasurementApiController implements Controller {
     @Override
     public void configureRoutes(Service http) {
         http.get(Path.Api.MEASUREMENT, AcceptType.APPLICATION_JSON, asSparkRoute(this::getMeasurements), new JsonResponseTransformer());
+        http.get(Path.Api.MEASUREMENT + ":source", AcceptType.APPLICATION_JSON, asSparkRoute(this::getMeasurementsForSource), new JsonResponseTransformer());
         http.post(Path.Api.MEASUREMENT, AcceptType.APPLICATION_JSON, asSparkRoute(this::postMeasurement), new JsonResponseTransformer());
     }
 
     Result getMeasurements(Request request) {
         QueryResult<DbMeasurementBean> queryResult = measurementRepository.find(PaginationSettings.fromQuery(request));
+
+        ResultBuilder resultBuilder = result();
+
+        PaginationHeader.appendHeaders(resultBuilder, queryResult.getPaginationInformation());
+
+        return resultBuilder
+                .type(AcceptType.APPLICATION_JSON)
+                .returnPayload(
+                        queryResult
+                                .getData().stream()
+                                .map(MeasurementBean::fromDbBean)
+                                .collect(toList())
+                );
+    }
+
+    Result getMeasurementsForSource(Request request) {
+        String source = request.params("source");
+
+        QueryResult<DbMeasurementBean> queryResult = measurementRepository.find(source, PaginationSettings.fromQuery(request));
 
         ResultBuilder resultBuilder = result();
 

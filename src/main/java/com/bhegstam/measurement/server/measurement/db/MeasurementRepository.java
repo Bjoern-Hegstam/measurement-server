@@ -1,9 +1,6 @@
 package com.bhegstam.measurement.server.measurement.db;
 
-import com.bhegstam.measurement.server.db.DatabaseConfiguration;
-import com.bhegstam.measurement.server.db.PaginationInformation;
-import com.bhegstam.measurement.server.db.PaginationSettings;
-import com.bhegstam.measurement.server.db.QueryResult;
+import com.bhegstam.measurement.server.db.*;
 import com.bhegstam.measurement.server.logging.InjectLogger;
 import com.google.inject.Inject;
 import org.apache.logging.log4j.Logger;
@@ -26,18 +23,27 @@ public class MeasurementRepository {
     }
 
     public QueryResult<DbMeasurementBean> find(PaginationSettings paginationSettings) {
-        logger.debug("Finding measurements");
+        return find(null, paginationSettings);
+    }
 
+    public QueryResult<DbMeasurementBean> find(String source, PaginationSettings paginationSettings) {
+        logger.debug("Finding measurements");
 
         List<DbMeasurementBean> measurements = new ArrayList<>();
         List<PaginationInformation> pageInfoContainer = new ArrayList<>();
 
         withConnection(conn -> {
-            String totalCountQuery = "SELECT count(id) FROM measurement";
-            final int totalCount;
+            SqlQueryData totalCountQueryData = new SqlBuilder()
+                    .append(Sql.SELECT)
+                    .append(Sql.count("id"))
+                    .append(Sql.FROM)
+                    .append("measurement")
+                    .build();
+            logger.debug(totalCountQueryData);
 
+            final int totalCount;
             try (Statement statement = conn.createStatement()) {
-                ResultSet rs = statement.executeQuery(totalCountQuery);
+                ResultSet rs = statement.executeQuery(totalCountQueryData.getQuery());
                 rs.next();
                 totalCount = rs.getInt(1);
             } catch (SQLException e) {
@@ -49,14 +55,41 @@ public class MeasurementRepository {
             pageInfoContainer.add(paginationInformation);
             logger.debug(paginationInformation);
 
-            String query = "SELECT id, source, timestamp, type, value, unit " +
-                    "FROM measurement " +
-                    "ORDER BY timestamp DESC " +
-                    "LIMIT ? OFFSET ?";
+            SqlBuilder sqlBuilder = new SqlBuilder();
+            sqlBuilder
+                    .append(Sql.SELECT)
+                    .append("id").append(", ")
+                    .append("source").append(", ")
+                    .append("timestamp").append(", ")
+                    .append("type").append(", ")
+                    .append("value").append(", ")
+                    .append("unit");
 
-            try (PreparedStatement statement = conn.prepareStatement(query)) {
-                statement.setInt(1, paginationInformation.getPerPage());
-                statement.setInt(2, paginationInformation.getOffset());
+            sqlBuilder.append(Sql.FROM)
+                      .append("measurement");
+
+            if (source != null) {
+                sqlBuilder.append(Sql.WHERE)
+                          .append("source")
+                          .append(Sql.EQUALS)
+                          .appendParametrizedValue(source);
+            }
+
+            sqlBuilder.append(Sql.ORDER_BY)
+                      .append("timestamp")
+                      .append(Sql.DESC);
+
+            sqlBuilder.append(Sql.LIMIT)
+                      .appendParametrizedValue(paginationInformation.getPerPage())
+                      .append(Sql.OFFSET)
+                      .appendParametrizedValue(paginationInformation.getOffset());
+
+            SqlQueryData selectMeasurementsQueryData = sqlBuilder.build();
+            logger.debug(selectMeasurementsQueryData);
+
+            try (PreparedStatement statement = conn.prepareStatement(selectMeasurementsQueryData.getQuery())) {
+                selectMeasurementsQueryData.setValues(statement);
+
                 ResultSet rs = statement.executeQuery();
 
                 while (rs.next()) {
