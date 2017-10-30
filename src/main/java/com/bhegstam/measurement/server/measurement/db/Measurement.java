@@ -2,7 +2,17 @@ package com.bhegstam.measurement.server.measurement.db;
 
 import java.time.Instant;
 
-public class DbMeasurementBean {
+public class Measurement {
+    static class DB {
+        static final String TABLE_NAME = "measurement";
+        static final String ID = "id";
+        static final String SOURCE = "source";
+        static final String TIMESTAMP = "timestamp";
+        static final String TYPE = "type";
+        static final String VALUE = "value";
+        static final String UNIT = "unit";
+    }
+
     private String source;
     private Instant createdAt;
     private String type;
@@ -51,7 +61,7 @@ public class DbMeasurementBean {
 
     @Override
     public String toString() {
-        return "DbMeasurementBean{" +
+        return "Measurement{" +
                 "source='" + source + '\'' +
                 ", createdAt=" + createdAt +
                 ", type='" + type + '\'' +

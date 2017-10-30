@@ -2,7 +2,7 @@ package com.bhegstam.measurement.server.measurement.api;
 
 import com.bhegstam.measurement.server.db.PaginationSettings;
 import com.bhegstam.measurement.server.db.QueryResult;
-import com.bhegstam.measurement.server.measurement.db.DbMeasurementBean;
+import com.bhegstam.measurement.server.measurement.db.Measurement;
 import com.bhegstam.measurement.server.measurement.db.MeasurementRepository;
 import com.bhegstam.measurement.server.util.AcceptType;
 import com.bhegstam.measurement.server.util.JsonResponseTransformer;
@@ -36,7 +36,7 @@ public class MeasurementApiController implements Controller {
     }
 
     Result getMeasurements(Request request) {
-        QueryResult<DbMeasurementBean> queryResult = measurementRepository.find(PaginationSettings.fromQuery(request));
+        QueryResult<Measurement> queryResult = measurementRepository.find(PaginationSettings.fromQuery(request));
 
         ResultBuilder resultBuilder = result();
 
@@ -55,7 +55,7 @@ public class MeasurementApiController implements Controller {
     Result getMeasurementsForSource(Request request) {
         String source = request.params("source");
 
-        QueryResult<DbMeasurementBean> queryResult = measurementRepository.find(source, PaginationSettings.fromQuery(request));
+        QueryResult<Measurement> queryResult = measurementRepository.find(source, PaginationSettings.fromQuery(request));
 
         ResultBuilder resultBuilder = result();
 
@@ -75,7 +75,7 @@ public class MeasurementApiController implements Controller {
         MeasurementBean measurement = MeasurementBean.fromJson(request.body());
         measurement.setCreatedAtMillis(System.currentTimeMillis());
 
-        DbMeasurementBean newMeasurement = measurementRepository.create(measurement.toDbBean());
+        Measurement newMeasurement = measurementRepository.create(measurement.toDbBean());
 
         return result()
                 .type(AcceptType.APPLICATION_JSON)

@@ -9,6 +9,8 @@ public class Sql {
     public static final String DESC = " DESC ";
     public static final String LIMIT = " LIMIT ";
     public static final String OFFSET = " OFFSET ";
+    public static final String INSERT_INTO = "INSERT INTO ";
+    public static final String VALUES = " VALUES ";
 
     public static String count(String column) {
         return String.format("count(%s)", column);

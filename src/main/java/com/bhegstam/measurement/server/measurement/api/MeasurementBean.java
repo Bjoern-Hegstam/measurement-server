@@ -1,6 +1,6 @@
 package com.bhegstam.measurement.server.measurement.api;
 
-import com.bhegstam.measurement.server.measurement.db.DbMeasurementBean;
+import com.bhegstam.measurement.server.measurement.db.Measurement;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
@@ -63,8 +63,8 @@ public class MeasurementBean {
         this.unit = unit;
     }
 
-    public DbMeasurementBean toDbBean() {
-        DbMeasurementBean bean = new DbMeasurementBean();
+    public Measurement toDbBean() {
+        Measurement bean = new Measurement();
         bean.setSource(source);
         bean.setCreatedAt(Instant.ofEpochMilli(createdAtMillis));
         bean.setType(type);
@@ -73,7 +73,7 @@ public class MeasurementBean {
         return bean;
     }
 
-    public static MeasurementBean fromDbBean(DbMeasurementBean dbBean) {
+    public static MeasurementBean fromDbBean(Measurement dbBean) {
         MeasurementBean bean = new MeasurementBean();
         bean.setSource(dbBean.getSource());
         bean.setCreatedAtMillis(dbBean.getCreatedAt().toEpochMilli());

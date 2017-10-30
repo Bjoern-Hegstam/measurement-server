@@ -22,22 +22,22 @@ public class MeasurementRepository {
         this.dbConf = dbConf;
     }
 
-    public QueryResult<DbMeasurementBean> find(PaginationSettings paginationSettings) {
+    public QueryResult<Measurement> find(PaginationSettings paginationSettings) {
         return find(null, paginationSettings);
     }
 
-    public QueryResult<DbMeasurementBean> find(String source, PaginationSettings paginationSettings) {
+    public QueryResult<Measurement> find(String source, PaginationSettings paginationSettings) {
         logger.debug("Finding measurements");
 
-        List<DbMeasurementBean> measurements = new ArrayList<>();
+        List<Measurement> measurements = new ArrayList<>();
         List<PaginationInformation> pageInfoContainer = new ArrayList<>();
 
         withConnection(conn -> {
             SqlQueryData totalCountQueryData = new SqlBuilder()
                     .append(Sql.SELECT)
-                    .append(Sql.count("id"))
+                    .append(Sql.count(Measurement.DB.ID))
                     .append(Sql.FROM)
-                    .append("measurement")
+                    .append(Measurement.DB.TABLE_NAME)
                     .build();
             logger.debug(totalCountQueryData);
 
@@ -46,6 +46,7 @@ public class MeasurementRepository {
                 ResultSet rs = statement.executeQuery(totalCountQueryData.getQuery());
                 rs.next();
                 totalCount = rs.getInt(1);
+                logger.debug("Measurement count (total): " + totalCount);
             } catch (SQLException e) {
                 logger.error("Error when creating statement", e);
                 return;
@@ -58,25 +59,25 @@ public class MeasurementRepository {
             SqlBuilder sqlBuilder = new SqlBuilder();
             sqlBuilder
                     .append(Sql.SELECT)
-                    .append("id").append(", ")
-                    .append("source").append(", ")
-                    .append("timestamp").append(", ")
-                    .append("type").append(", ")
-                    .append("value").append(", ")
-                    .append("unit");
+                    .append(Measurement.DB.ID).append(", ")
+                    .append(Measurement.DB.SOURCE).append(", ")
+                    .append(Measurement.DB.TIMESTAMP).append(", ")
+                    .append(Measurement.DB.TYPE).append(", ")
+                    .append(Measurement.DB.VALUE).append(", ")
+                    .append(Measurement.DB.UNIT);
 
             sqlBuilder.append(Sql.FROM)
-                      .append("measurement");
+                      .append(Measurement.DB.TABLE_NAME);
 
             if (source != null) {
                 sqlBuilder.append(Sql.WHERE)
-                          .append("source")
+                          .append(Measurement.DB.SOURCE)
                           .append(Sql.EQUALS)
                           .appendParametrizedValue(source);
             }
 
             sqlBuilder.append(Sql.ORDER_BY)
-                      .append("timestamp")
+                      .append(Measurement.DB.TIMESTAMP)
                       .append(Sql.DESC);
 
             sqlBuilder.append(Sql.LIMIT)
@@ -93,7 +94,7 @@ public class MeasurementRepository {
                 ResultSet rs = statement.executeQuery();
 
                 while (rs.next()) {
-                    DbMeasurementBean bean = new DbMeasurementBean();
+                    Measurement bean = new Measurement();
                     bean.setSource(rs.getString(2));
                     bean.setCreatedAt(Instant.ofEpochMilli(rs.getTimestamp(3).getTime()));
                     bean.setType(rs.getString(4));
@@ -109,19 +110,35 @@ public class MeasurementRepository {
         return new QueryResult<>(measurements, pageInfoContainer.get(0));
     }
 
-    public DbMeasurementBean create(DbMeasurementBean measurement) {
+    public Measurement create(Measurement measurement) {
         logger.debug("Creating measurement");
         logger.debug(measurement);
 
-        String insertString = "INSERT INTO measurement (source, timestamp, type, value, unit) VALUES (?, ?, ?, ?, ?)";
+        SqlQueryData insertQueryData = new SqlBuilder()
+                .append(Sql.INSERT_INTO)
+                .append(Measurement.DB.TABLE_NAME)
+                .append(" (")
+                .append(Measurement.DB.SOURCE).append(", ")
+                .append(Measurement.DB.TIMESTAMP).append(", ")
+                .append(Measurement.DB.TYPE).append(", ")
+                .append(Measurement.DB.VALUE).append(", ")
+                .append(Measurement.DB.UNIT)
+                .append(")")
+                .append(Sql.VALUES)
+                .append("(")
+                .appendParametrizedValue(measurement.getSource()).append(", ")
+                .appendParametrizedValue(new Timestamp(measurement.getCreatedAt().toEpochMilli())).append(", ")
+                .appendParametrizedValue(measurement.getType()).append(", ")
+                .appendParametrizedValue(measurement.getValue()).append(", ")
+                .appendParametrizedValue(measurement.getUnit())
+                .append(")")
+                .build();
+
+        logger.debug(insertQueryData);
 
         withConnection(conn -> {
-            try (PreparedStatement insertMeasurement = conn.prepareStatement(insertString)) {
-                insertMeasurement.setString(1, measurement.getSource());
-                insertMeasurement.setTimestamp(2, new Timestamp(measurement.getCreatedAt().toEpochMilli()));
-                insertMeasurement.setString(3, measurement.getType());
-                insertMeasurement.setDouble(4, measurement.getValue());
-                insertMeasurement.setString(5, measurement.getUnit());
+            try (PreparedStatement insertMeasurement = conn.prepareStatement(insertQueryData.getQuery())) {
+                insertQueryData.setValues(insertMeasurement);
                 insertMeasurement.executeUpdate();
             } catch (SQLException e) {
                 logger.error("Error when creating insert statement", e);
@@ -137,7 +154,6 @@ public class MeasurementRepository {
                 dbConf.getUser(),
                 dbConf.getPassword()
         )) {
-            logger.debug("Database connection established");
             consumer.accept(conn);
         } catch (SQLException e) {
             logger.error("Failed to connect to database", e);
