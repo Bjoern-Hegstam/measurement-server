@@ -100,4 +100,18 @@ public class PaginationInformationTest {
         errorCollector.checkThat("Prev page", calculated.getPrevPage(), is(expectedInformation.getPrevPage()));
         errorCollector.checkThat("Next page", calculated.getNextPage(), is(expectedInformation.getNextPage()));
     }
+
+    @Test
+    public void offset() {
+        testOffset("First page", PER_PAGE, 1, 0);
+        testOffset("Second page", PER_PAGE, 2, PER_PAGE);
+    }
+
+    private void testOffset(String reason, int perPage, int page, int expectedOffset) {
+        // given
+        PaginationInformation paginationInformation = new PaginationInformation(10, perPage, page, null, null);
+
+        // then
+        errorCollector.checkThat(reason, paginationInformation.getOffset(), is(expectedOffset));
+    }
 }

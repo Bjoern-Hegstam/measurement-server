@@ -1,5 +1,6 @@
 package com.bhegstam.measurement.server.measurement.api;
 
+import com.bhegstam.measurement.server.db.PaginationSettings;
 import com.bhegstam.measurement.server.measurement.db.DbMeasurementBean;
 import com.bhegstam.measurement.server.measurement.db.MeasurementRepository;
 import com.bhegstam.measurement.server.util.AcceptType;
@@ -34,7 +35,7 @@ public class MeasurementApiController implements Controller {
 
     private Result getMeasurements(Request request) {
         List<MeasurementBean> measurements = measurementRepository
-                .getAll().stream()
+                .find(PaginationSettings.fromQuery(request)).stream()
                 .map(MeasurementBean::fromDbBean)
                 .collect(toList());
 

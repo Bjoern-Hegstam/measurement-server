@@ -60,4 +60,19 @@ public class PaginationInformation {
     public Optional<Integer> getPrevPage() {
         return Optional.ofNullable(prevPage);
     }
+
+    public int getOffset() {
+        return (page - 1) * perPage;
+    }
+
+    @Override
+    public String toString() {
+        return "PaginationInformation{" +
+                "pageCount=" + pageCount +
+                ", perPage=" + perPage +
+                ", page=" + page +
+                ", nextPage=" + nextPage +
+                ", prevPage=" + prevPage +
+                '}';
+    }
 }
