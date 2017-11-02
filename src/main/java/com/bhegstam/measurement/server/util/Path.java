@@ -10,6 +10,6 @@ public class Path {
     }
 
     public static class Api {
-        public static final String MEASUREMENT = "/measurement/";
+        public static final String MEASUREMENT = "/measurement";
     }
 }

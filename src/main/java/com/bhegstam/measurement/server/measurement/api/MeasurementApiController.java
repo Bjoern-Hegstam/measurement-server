@@ -31,7 +31,7 @@ public class MeasurementApiController implements Controller {
     @Override
     public void configureRoutes(Service http) {
         http.get(Path.Api.MEASUREMENT, AcceptType.APPLICATION_JSON, asSparkRoute(this::getMeasurements), new JsonResponseTransformer());
-        http.get(Path.Api.MEASUREMENT + ":source", AcceptType.APPLICATION_JSON, asSparkRoute(this::getMeasurementsForSource), new JsonResponseTransformer());
+        http.get(Path.Api.MEASUREMENT + "/:source", AcceptType.APPLICATION_JSON, asSparkRoute(this::getMeasurementsForSource), new JsonResponseTransformer());
         http.post(Path.Api.MEASUREMENT, AcceptType.APPLICATION_JSON, asSparkRoute(this::postMeasurement), new JsonResponseTransformer());
     }
 
