@@ -1,72 +1,57 @@
 define(['jquery', 'app/db/measurement'], function ($, db) {
-    function Attribute(niceName, dataName, dataType) {
-        return {
-            niceName: niceName,
-            dataName: dataName,
-            dataType: dataType
-        }
-    }
-
-    var MeasurementAttributes = [
-        Attribute('Source', 'source', 'string'),
-        Attribute('Type', 'type', 'string'),
-        Attribute('Value', 'value', 'numeric'),
-        Attribute('Created at', 'createdAtMillis', 'timestamp')
-    ];
 
     db.getSources()
         .done(function (sources) {
+            clearTables();
             sources.forEach(function (source) {
                 db.getMeasurements(source.name)
                     .done(function (measurements) {
-                        console.log(measurements);
+                        updateTable(source, measurements);
                     });
             })
         });
 
-/*    db.getMeasurements()
-        .done(function (measurements) {
-            var dataTable = document.createElement('table');
-            dataTable.classList.add('data-table');
+    function clearTables() {
+        $('#dashboard-container').empty();
+    }
 
-            // Table header
-            var header = document.createElement('thead');
-            dataTable.appendChild(header);
+    function updateTable(source, measurements) {
+        var $dataTable = $('<table>', {'class': 'data-table'});
 
-            MeasurementAttributes.forEach(function (a) {
-                var td = document.createElement('td');
-                td.innerText = a.niceName;
-                header.appendChild(td);
-            });
+        // Table header
+        $dataTable.append(
+            $('<thead>').append(
+                $('<td>').text('Source'),
+                $('<td>').text('Type'),
+                $('<td>').text('Value'),
+                $('<td>').text('Created at')
+            )
+        );
 
-            // Measurement rows
-            measurements.forEach(function (measurement) {
-                var row = document.createElement('tr');
-                MeasurementAttributes.forEach(function (a) {
-                    var td = document.createElement('td');
+        // Measurement rows
+        measurements.forEach(function (measurement) {
+            $dataTable.append(
+                $('<tr>').append(
+                    $('<td>').text(measurement.source.name),
+                    $('<td>').text(measurement.type),
+                    $('<td>').text(measurement.value),
+                    $('<td>').text(formatTimestamp(measurement.timestamp))
+                )
+            );
+        });
 
-                    if (a.dataType === 'timestamp') {
-                        var currentDate = new Date();
-                        var timestamp = new Date(measurement[a.dataName]);
-                        var localTimestamp = new Date(timestamp.getTime() - currentDate.getTimezoneOffset() * 60000); // Convert min to ms
-                        td.innerText = localTimestamp.toISOString();
-                    } else {
-                        td.innerText = measurement[a.dataName];
-                    }
-                    td.classList.add(a.dataType);
-                    row.appendChild(td);
-                });
-                dataTable.appendChild(row);
-            });
+        // Show user new table
+        var $container = $('<div>').append(
+            $('<p>').text(source.name),
+            $dataTable
+        );
 
-            // Show user new table
-            var container = document.getElementById('dashboard-container');
+        $('#dashboard-container').append($container);
+    }
 
-            if (container.childElementCount > 0) {
-                container.removeChild(container.firstChild)
-            }
-
-            container.appendChild(dataTable)
-
-        });*/
+    function formatTimestamp(timestamp_str) {
+        var currentDate = new Date();
+        var timestamp = new Date(timestamp_str);
+        return new Date(timestamp.getTime() - currentDate.getTimezoneOffset() * 60000); // Convert min to ms
+    }
 });
