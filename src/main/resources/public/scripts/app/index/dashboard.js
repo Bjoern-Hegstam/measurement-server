@@ -35,7 +35,7 @@ define(['jquery', 'app/db/measurement'], function ($, db) {
                     $('<td>').text(measurement.source.name),
                     $('<td>').text(measurement.type),
                     $('<td>').text(measurement.value),
-                    $('<td>').text(formatTimestamp(measurement.timestamp))
+                    $('<td>').text(formatTimestamp(measurement.createdAtMillis))
                 )
             );
         });
@@ -52,6 +52,7 @@ define(['jquery', 'app/db/measurement'], function ($, db) {
     function formatTimestamp(timestamp_str) {
         var currentDate = new Date();
         var timestamp = new Date(timestamp_str);
-        return new Date(timestamp.getTime() - currentDate.getTimezoneOffset() * 60000); // Convert min to ms
+        var localTimestamp = new Date(timestamp.getTime() - currentDate.getTimezoneOffset() * 60000); // Convert min to ms
+        return localTimestamp.toISOString()
     }
 });
