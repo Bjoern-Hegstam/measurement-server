@@ -1,8 +1,15 @@
 define(['jquery'], function ($) {
     return {
-        getMeasurements: function () {
+        getSources: function () {
             return $.get({
-                url: '/api/measurement',
+                url: '/api/sources',
+                dataType: 'json'
+            })
+        },
+
+        getMeasurements: function (source) {
+            return $.get({
+                url: '/api/sources/' + source + '/measurements',
                 dataType: 'json'
             })
         }

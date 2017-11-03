@@ -14,7 +14,17 @@ define(['jquery', 'app/db/measurement'], function ($, db) {
         Attribute('Created at', 'createdAtMillis', 'timestamp')
     ];
 
-    db.getMeasurements()
+    db.getSources()
+        .done(function (sources) {
+            sources.forEach(function (source) {
+                db.getMeasurements(source.name)
+                    .done(function (measurements) {
+                        console.log(measurements);
+                    });
+            })
+        });
+
+/*    db.getMeasurements()
         .done(function (measurements) {
             var dataTable = document.createElement('table');
             dataTable.classList.add('data-table');
@@ -58,5 +68,5 @@ define(['jquery', 'app/db/measurement'], function ($, db) {
 
             container.appendChild(dataTable)
 
-        });
+        });*/
 });

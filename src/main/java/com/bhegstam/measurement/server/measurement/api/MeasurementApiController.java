@@ -15,6 +15,8 @@ import com.bhegstam.webutil.webapp.ResultBuilder;
 import com.google.inject.Inject;
 import spark.Service;
 
+import java.util.function.Function;
+
 import static com.bhegstam.webutil.webapp.ResultBuilder.result;
 import static com.bhegstam.webutil.webapp.SparkWrappers.asSparkRoute;
 import static java.util.stream.Collectors.toList;
@@ -30,32 +32,42 @@ public class MeasurementApiController implements Controller {
 
     @Override
     public void configureRoutes(Service http) {
-        http.get(Path.Api.MEASUREMENT, AcceptType.APPLICATION_JSON, asSparkRoute(this::getMeasurements), new JsonResponseTransformer());
-        http.get(Path.Api.MEASUREMENT + "/:source", AcceptType.APPLICATION_JSON, asSparkRoute(this::getMeasurementsForSource), new JsonResponseTransformer());
-        http.post(Path.Api.MEASUREMENT, AcceptType.APPLICATION_JSON, asSparkRoute(this::postMeasurement), new JsonResponseTransformer());
+        JsonResponseTransformer jsonResponseTransformer = new JsonResponseTransformer();
+
+        http.get(Path.Api.SOURCES, AcceptType.APPLICATION_JSON, asSparkRoute(this::getSources), jsonResponseTransformer);
+        http.path(
+                Path.Api.SOURCES,
+                () -> {
+                    http.get("", asSparkRoute(this::getSources), jsonResponseTransformer);
+                    http.get("/:source" + Path.Api.MEASUREMENTS, asSparkRoute(this::getMeasurementsForSource), jsonResponseTransformer);
+
+                }
+        );
+
+        http.post(Path.Api.MEASUREMENTS, AcceptType.APPLICATION_JSON, asSparkRoute(this::postMeasurement), jsonResponseTransformer);
     }
 
-    Result getMeasurements(Request request) {
-        QueryResult<Measurement> queryResult = measurementRepository.find(PaginationSettings.fromQuery(request));
-        return resultFromQueryResult(queryResult);
+    Result getSources(Request request) {
+        QueryResult<String> queryResult = measurementRepository.findSources();
+        return resultFromQueryResult(queryResult, MeasurementSource::new);
     }
 
     Result getMeasurementsForSource(Request request) {
         QueryResult<Measurement> queryResult = measurementRepository.find(request.params("source"), PaginationSettings.fromQuery(request));
-        return resultFromQueryResult(queryResult);
+        return resultFromQueryResult(queryResult, MeasurementBean::fromDbBean);
     }
 
-    private Result resultFromQueryResult(QueryResult<Measurement> queryResult) {
+    private <T> Result resultFromQueryResult(QueryResult<T> queryResult, Function<T, ?> dataFun) {
         ResultBuilder resultBuilder = result();
 
-        PaginationHeader.appendHeaders(resultBuilder, queryResult.getPaginationInformation());
+        queryResult.getPaginationInformation().ifPresent(pageInfo -> PaginationHeader.appendHeaders(resultBuilder, pageInfo));
 
         return resultBuilder
                 .type(AcceptType.APPLICATION_JSON)
                 .returnPayload(
                         queryResult
                                 .getData().stream()
-                                .map(MeasurementBean::fromDbBean)
+                                .map(dataFun)
                                 .collect(toList())
                 );
     }

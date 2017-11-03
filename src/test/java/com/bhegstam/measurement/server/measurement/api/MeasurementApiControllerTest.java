@@ -35,7 +35,7 @@ public class MeasurementApiControllerTest {
     @Test
     public void getMeasurements_pagination_headers() {
         // given
-        when(repository.find(any())).thenReturn(
+        when(repository.find(any(), any())).thenReturn(
                 new QueryResult<>(
                         new ArrayList<>(),
                         new PaginationInformation(200,5, 40, 1, 2, null)
@@ -43,7 +43,7 @@ public class MeasurementApiControllerTest {
         );
 
         // when
-        Result result = controller.getMeasurements(mockRequest());
+        Result result = controller.getMeasurementsForSource(mockRequest());
 
         // then
         checkHeader(result, PaginationHeader.TOTAL, "200");

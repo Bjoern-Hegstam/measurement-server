@@ -22,10 +22,6 @@ public class MeasurementRepository {
         this.dbConf = dbConf;
     }
 
-    public QueryResult<Measurement> find(PaginationSettings paginationSettings) {
-        return find(null, paginationSettings);
-    }
-
     public QueryResult<Measurement> find(String source, PaginationSettings paginationSettings) {
         logger.debug("Finding measurements");
 
@@ -33,28 +29,22 @@ public class MeasurementRepository {
         List<PaginationInformation> pageInfoContainer = new ArrayList<>();
 
         withConnection(conn -> {
-            SqlQueryData totalCountQueryData = new SqlBuilder()
-                    .append(Sql.SELECT)
-                    .append(Sql.count(Measurement.DB.ID))
-                    .append(Sql.FROM)
-                    .append(Measurement.DB.TABLE_NAME)
-                    .build();
-            logger.debug(totalCountQueryData);
+            PaginationInformation paginationInformation = getPaginationInfo(
+                    conn,
+                    paginationSettings,
+                    new SqlBuilder()
+                            .append(Sql.SELECT)
+                            .append(Sql.count(Measurement.DB.ID))
+                            .append(Sql.FROM)
+                            .append(Measurement.DB.TABLE_NAME)
+                            .build()
+            );
 
-            final int totalCount;
-            try (Statement statement = conn.createStatement()) {
-                ResultSet rs = statement.executeQuery(totalCountQueryData.getQuery());
-                rs.next();
-                totalCount = rs.getInt(1);
-                logger.debug("Measurement count (total): " + totalCount);
-            } catch (SQLException e) {
-                logger.error("Error when creating statement", e);
+            if (paginationInformation == null) {
                 return;
             }
 
-            PaginationInformation paginationInformation = PaginationInformation.calculate(totalCount, paginationSettings);
             pageInfoContainer.add(paginationInformation);
-            logger.debug(paginationInformation);
 
             SqlBuilder sqlBuilder = new SqlBuilder();
             sqlBuilder
@@ -148,6 +138,36 @@ public class MeasurementRepository {
         return measurement;
     }
 
+    public QueryResult<String> findSources() {
+        logger.debug("Finding sources");
+
+        List<String> sources = new ArrayList<>();
+
+        withConnection(conn -> {
+            SqlQueryData selectSourcesQueryData = new SqlBuilder()
+                    .append(Sql.SELECT)
+                    .append(Sql.DISTINCT)
+                    .append(Measurement.DB.SOURCE)
+                    .append(Sql.FROM)
+                    .append(Measurement.DB.TABLE_NAME)
+                    .build();
+            logger.debug(selectSourcesQueryData);
+
+            try (Statement statement = conn.createStatement()) {
+                ResultSet rs = statement.executeQuery(selectSourcesQueryData.getQuery());
+                while (rs.next()) {
+                    sources.add(rs.getString(1));
+                }
+
+            } catch (SQLException e) {
+                logger.debug("Error when creating statement", e);
+            }
+        });
+
+        logger.debug(sources);
+        return new QueryResult<>(sources);
+    }
+
     private void withConnection(Consumer<Connection> consumer) {
         try (Connection conn = DriverManager.getConnection(
                 dbConf.getUrl(),
@@ -158,5 +178,24 @@ public class MeasurementRepository {
         } catch (SQLException e) {
             logger.error("Failed to connect to database", e);
         }
+    }
+
+    private PaginationInformation getPaginationInfo(Connection conn, PaginationSettings paginationSettings, SqlQueryData totalCountQueryData) {
+        logger.debug(totalCountQueryData);
+
+        final int totalCount;
+        try (Statement statement = conn.createStatement()) {
+            ResultSet rs = statement.executeQuery(totalCountQueryData.getQuery());
+            rs.next();
+            totalCount = rs.getInt(1);
+            logger.debug("Count (total): " + totalCount);
+        } catch (SQLException e) {
+            logger.error("Error when creating statement", e);
+            return null;
+        }
+
+        PaginationInformation paginationInformation = PaginationInformation.calculate(totalCount, paginationSettings);
+        logger.debug(paginationInformation);
+        return paginationInformation;
     }
 }

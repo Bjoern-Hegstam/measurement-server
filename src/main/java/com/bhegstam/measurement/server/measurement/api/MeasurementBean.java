@@ -7,7 +7,7 @@ import java.io.IOException;
 import java.time.Instant;
 
 public class MeasurementBean {
-    private String source;
+    private MeasurementSource source;
     private long createdAtMillis;
     private String type;
     private double value;
@@ -23,11 +23,11 @@ public class MeasurementBean {
         }
     }
 
-    public String getSource() {
+    public MeasurementSource getSource() {
         return source;
     }
 
-    public void setSource(String source) {
+    public void setSource(MeasurementSource source) {
         this.source = source;
     }
 
@@ -65,7 +65,7 @@ public class MeasurementBean {
 
     public Measurement toDbBean() {
         Measurement bean = new Measurement();
-        bean.setSource(source);
+        bean.setSource(source.getName());
         bean.setCreatedAt(Instant.ofEpochMilli(createdAtMillis));
         bean.setType(type);
         bean.setValue(value);
@@ -75,7 +75,7 @@ public class MeasurementBean {
 
     public static MeasurementBean fromDbBean(Measurement dbBean) {
         MeasurementBean bean = new MeasurementBean();
-        bean.setSource(dbBean.getSource());
+        bean.setSource(new MeasurementSource(dbBean.getSource()));
         bean.setCreatedAtMillis(dbBean.getCreatedAt().toEpochMilli());
         bean.setType(dbBean.getType());
         bean.setValue(dbBean.getValue());
