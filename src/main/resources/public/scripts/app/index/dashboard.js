@@ -4,12 +4,32 @@ define(['jquery', 'app/db/measurement'], function ($, db) {
         .done(function (sources) {
             clearTables();
             sources.forEach(function (source) {
-                db.getMeasurements(source.name)
-                    .done(function (measurements) {
-                        updateTable(source, measurements);
-                    });
+                loadAndVisualizeMeasurements(source);
             })
         });
+
+    function loadAndVisualizeMeasurements(source, loadedMeasurements, page) {
+        if (arguments.length < 3) {
+            page = 1;
+        }
+
+        if (arguments.length < 2) {
+            loadedMeasurements = [];
+        }
+
+        db.getMeasurements(source.name) // TODO: Need to add page query args
+            .done(function (measurements) { // TODO: Callback needs to get pagination information (maybe provided automatically if we just add another parameter? Check jquery docs)
+                var newMeasurements = loadedMeasurements.concat(measurements);
+                var getMoreMeasurements = false; // TODO: Check if more are required and there is another page
+
+                if (getMoreMeasurements) {
+                    loadAndVisualizeMeasurements(source, newMeasurements, page + 1);
+                } else {
+                    // ELSE draw graph/fill table
+                    updateTable(source, newMeasurements)
+                }
+            })
+    }
 
     function clearTables() {
         $('#dashboard-container').empty();
