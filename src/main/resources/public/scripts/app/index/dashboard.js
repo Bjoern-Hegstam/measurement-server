@@ -6,19 +6,27 @@ define(['jquery', 'app/db/measurement'], function ($, db) {
             sources.forEach(function (source) {
                 var createdAfter = new Date();
                 createdAfter.setDate(createdAfter.getDate() - 7); // One week ago
-                loadAndVisualizeMeasurements(source, createdAfter);
+
+                loadMeasurements(source, createdAfter)
+                    .then(function (measurements) {
+                        updateTable(source, measurements)
+                    });
             })
         });
 
-    function loadAndVisualizeMeasurements(source, createdAfter) {
-        _loadAndVisualizeMeasurements(source, {
-            measurements: [],
-            page: 1,
-            createdAfter: createdAfter
-        })
+    function loadMeasurements(source, createdAfter) {
+        return new Promise(
+            function (resolve) {
+                _loadAndVisualizeMeasurements(source, {
+                    measurements: [],
+                    page: 1,
+                    createdAfter: createdAfter
+                }, resolve)
+            }
+        );
     }
 
-    function _loadAndVisualizeMeasurements(source, args) {
+    function _loadAndVisualizeMeasurements(source, args, callback) {
         db.getMeasurements(source.name, {page: args.page})
             .done(function (newMeasurements, textStatus, jqXHR) {
                 var measurements = args.measurements.concat(newMeasurements);
@@ -29,7 +37,7 @@ define(['jquery', 'app/db/measurement'], function ($, db) {
                         measurements: measurements,
                         page: args.page + 1,
                         createdAfter: args.createdAfter
-                    });
+                    }, callback);
                 } else {
                     var measurementsToPlot = [];
                     measurements.forEach(function (m) {
@@ -38,7 +46,7 @@ define(['jquery', 'app/db/measurement'], function ($, db) {
                         }
                     });
 
-                    updateTable(source, measurementsToPlot);
+                    callback(measurementsToPlot);
                 }
             })
     }
