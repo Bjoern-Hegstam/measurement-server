@@ -4,28 +4,41 @@ define(['jquery', 'app/db/measurement'], function ($, db) {
         .done(function (sources) {
             clearTables();
             sources.forEach(function (source) {
-                loadAndVisualizeMeasurements(source);
+                var createdAfter = new Date();
+                createdAfter.setDate(createdAfter.getDate() - 7); // One week ago
+                loadAndVisualizeMeasurements(source, createdAfter);
             })
         });
 
-    function loadAndVisualizeMeasurements(source, loadedMeasurements, page) {
-        if (arguments.length < 3) {
-            page = 1;
-        }
+    function loadAndVisualizeMeasurements(source, createdAfter) {
+        _loadAndVisualizeMeasurements(source, {
+            measurements: [],
+            page: 1,
+            createdAfter: createdAfter
+        })
+    }
 
-        if (arguments.length < 2) {
-            loadedMeasurements = [];
-        }
-
-        db.getMeasurements(source.name, {page: page})
+    function _loadAndVisualizeMeasurements(source, args) {
+        db.getMeasurements(source.name, {page: args.page})
             .done(function (newMeasurements, textStatus, jqXHR) {
-                var measurements = loadedMeasurements.concat(newMeasurements);
+                var measurements = args.measurements.concat(newMeasurements);
                 var getMoreMeasurements = jqXHR.getResponseHeader('X-Next-Page') !== null;
 
-                if (getMoreMeasurements) {
-                    loadAndVisualizeMeasurements(source, measurements, page + 1);
+                if (getMoreMeasurements && toLocalTimestamp(measurements[measurements.length - 1].createdAtMillis) > args.createdAfter) {
+                    _loadAndVisualizeMeasurements(source, {
+                        measurements: measurements,
+                        page: args.page + 1,
+                        createdAfter: args.createdAfter
+                    });
                 } else {
-                    updateTable(source, measurements)
+                    var measurementsToPlot = [];
+                    measurements.forEach(function (m) {
+                        if (toLocalTimestamp(m.createdAtMillis) > args.createdAfter) {
+                            measurementsToPlot.push(m);
+                        }
+                    });
+
+                    updateTable(source, measurementsToPlot);
                 }
             })
     }
@@ -69,9 +82,13 @@ define(['jquery', 'app/db/measurement'], function ($, db) {
     }
 
     function formatTimestamp(timestamp_str) {
+        var localTimestamp = toLocalTimestamp(timestamp_str);
+        return localTimestamp.toISOString()
+    }
+
+    function toLocalTimestamp(timestamp_str) {
         var currentDate = new Date();
         var timestamp = new Date(timestamp_str);
-        var localTimestamp = new Date(timestamp.getTime() - currentDate.getTimezoneOffset() * 60000); // Convert min to ms
-        return localTimestamp.toISOString()
+        return new Date(timestamp.getTime() - currentDate.getTimezoneOffset() * 60000);  // Convert min to ms
     }
 });
