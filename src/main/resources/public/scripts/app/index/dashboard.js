@@ -17,16 +17,15 @@ define(['jquery', 'app/db/measurement'], function ($, db) {
             loadedMeasurements = [];
         }
 
-        db.getMeasurements(source.name) // TODO: Need to add page query args
-            .done(function (measurements) { // TODO: Callback needs to get pagination information (maybe provided automatically if we just add another parameter? Check jquery docs)
-                var newMeasurements = loadedMeasurements.concat(measurements);
-                var getMoreMeasurements = false; // TODO: Check if more are required and there is another page
+        db.getMeasurements(source.name, {page: page})
+            .done(function (newMeasurements, textStatus, jqXHR) {
+                var measurements = loadedMeasurements.concat(newMeasurements);
+                var getMoreMeasurements = jqXHR.getResponseHeader('X-Next-Page') !== null;
 
                 if (getMoreMeasurements) {
-                    loadAndVisualizeMeasurements(source, newMeasurements, page + 1);
+                    loadAndVisualizeMeasurements(source, measurements, page + 1);
                 } else {
-                    // ELSE draw graph/fill table
-                    updateTable(source, newMeasurements)
+                    updateTable(source, measurements)
                 }
             })
     }

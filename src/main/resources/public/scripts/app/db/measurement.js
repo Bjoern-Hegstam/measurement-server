@@ -7,9 +7,14 @@ define(['jquery'], function ($) {
             })
         },
 
-        getMeasurements: function (source) {
+        getMeasurements: function (source, args) {
+            var url = '/api/sources/' + source + '/measurements?';
+            if (arguments.length === 2) {
+                url += $.param(args);
+            }
+
             return $.get({
-                url: '/api/sources/' + source + '/measurements',
+                url: url,
                 dataType: 'json'
             })
         }
