@@ -7,47 +7,39 @@ define(['jquery', 'app/db/measurement'], function ($, db) {
                 var createdAfter = new Date();
                 createdAfter.setDate(createdAfter.getDate() - 7); // One week ago
 
-                getMeasurements(source, createdAfter)
+                getMeasurements(source, {createdAfter: createdAfter})
                     .then(function (measurements) {
                         updateTable(source, measurements)
                     });
             })
         });
 
-    function getMeasurements(source, createdAfter) {
-        return new Promise(
-            function (resolve) {
-                _getMeasurements(source, resolve, {
-                    measurements: [],
-                    page: 1,
-                    createdAfter: createdAfter
-                })
-            }
-        );
-    }
+    function getMeasurements(source, args) {
+        if (!args.hasOwnProperty('measurements')) {
+            args.measurements = []
+        }
 
-    function _getMeasurements(source, callback, args) {
-        db.getMeasurements(source.name, {page: args.page})
-            .done(function (newMeasurements, textStatus, jqXHR) {
+        if (!args.hasOwnProperty('page')) {
+            args.page = 1;
+        }
+
+        return db
+            .getMeasurements(source.name, {page: args.page})
+            .then(function (newMeasurements, textStatus, jqXHR) {
                 var measurements = args.measurements.concat(newMeasurements);
                 var existsMore = jqXHR.getResponseHeader('X-Next-Page') !== null;
                 var lastRetrievedCreatedAfterCutoff = toLocalTimestamp(measurements[measurements.length - 1].createdAtMillis) > args.createdAfter;
 
                 if (existsMore && lastRetrievedCreatedAfterCutoff) {
-                    _getMeasurements(source, callback, {
+                    return getMeasurements(source, {
                         measurements: measurements,
                         page: args.page + 1,
                         createdAfter: args.createdAfter
                     });
                 } else {
-                    var measurementsToPlot = [];
-                    measurements.forEach(function (m) {
-                        if (toLocalTimestamp(m.createdAtMillis) > args.createdAfter) {
-                            measurementsToPlot.push(m);
-                        }
+                    return measurements.filter(function (m) {
+                        return toLocalTimestamp(m.createdAtMillis) > args.createdAfter;
                     });
-
-                    callback(measurementsToPlot);
                 }
             })
     }
