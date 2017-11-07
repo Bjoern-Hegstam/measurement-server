@@ -12,7 +12,7 @@ define(['jquery',  'chart', 'app/db/measurement'], function ($, chart, db) {
                         var $graph = createGraph(measurements);
 
                         var $container = $('<div>').append(
-                            $('<p>').text(source.name),
+                            $('<p>', {class: 'source-header'}).text(source.name),
                             $graph,
                             $dataTable
                         );
