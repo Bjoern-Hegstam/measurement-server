@@ -21,7 +21,8 @@ $bodyContent
     requirejs.config({
         baseUrl: '/scripts',
         paths: {
-            jquery: 'lib/jquery-3.2.1.min'
+            jquery: 'lib/jquery-3.2.1.min',
+            chart: 'lib/Chart.bundle.min'
         }
     });
 

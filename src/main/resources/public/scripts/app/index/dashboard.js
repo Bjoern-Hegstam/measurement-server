@@ -1,4 +1,4 @@
-define(['jquery', 'app/db/measurement'], function ($, db) {
+define(['jquery',  'chart', 'app/db/measurement'], function ($, chart, db) {
 
     db.getSources()
         .done(function (sources) {
@@ -9,8 +9,11 @@ define(['jquery', 'app/db/measurement'], function ($, db) {
                 getMeasurements(source, {createdAfter: createdAfter})
                     .then(function (measurements) {
                         var $dataTable = createTable(measurements);
+                        var $graph = createGraph(measurements);
+
                         var $container = $('<div>').append(
                             $('<p>').text(source.name),
+                            $graph,
                             $dataTable
                         );
                         $('#dashboard-container').append($container);
@@ -32,7 +35,7 @@ define(['jquery', 'app/db/measurement'], function ($, db) {
             .then(function (newMeasurements, textStatus, jqXHR) {
                 var measurements = args.measurements.concat(newMeasurements);
                 var existsMore = jqXHR.getResponseHeader('X-Next-Page') !== null;
-                var lastRetrievedCreatedAfterCutoff = toLocalTimestamp(measurements[measurements.length - 1].createdAtMillis) > args.createdAfter;
+                var lastRetrievedCreatedAfterCutoff = new Date(measurements[measurements.length - 1].createdAtMillis) > args.createdAfter;
 
                 if (existsMore && lastRetrievedCreatedAfterCutoff) {
                     return getMeasurements(source, {
@@ -42,14 +45,14 @@ define(['jquery', 'app/db/measurement'], function ($, db) {
                     });
                 } else {
                     return measurements.filter(function (m) {
-                        return toLocalTimestamp(m.createdAtMillis) > args.createdAfter;
+                        return new Date(m.createdAtMillis) > args.createdAfter;
                     });
                 }
             })
     }
 
     function createTable(measurements) {
-        var $dataTable = $('<table>', {'class': 'data-table'});
+        var $dataTable = $('<table>', {class: 'data-table'});
 
         // Table header
         $dataTable.append(
@@ -68,7 +71,7 @@ define(['jquery', 'app/db/measurement'], function ($, db) {
                     $('<td>').text(measurement.source.name),
                     $('<td>').text(measurement.type),
                     $('<td>').text(measurement.value),
-                    $('<td>').text(formatTimestamp(measurement.createdAtMillis))
+                    $('<td>').text(new Date(measurement.createdAtMillis).toLocaleString())
                 )
             );
         });
@@ -76,14 +79,46 @@ define(['jquery', 'app/db/measurement'], function ($, db) {
         return $dataTable;
     }
 
-    function formatTimestamp(timestamp_str) {
-        var localTimestamp = toLocalTimestamp(timestamp_str);
-        return localTimestamp.toISOString()
-    }
+    function createGraph(measurements) {
+        var data = [];
+        measurements.forEach(function (m) {
+            data.push({
+                x: new Date(m.createdAtMillis),
+                y: m.value
+            });
+        });
 
-    function toLocalTimestamp(timestamp_str) {
-        var currentDate = new Date();
-        var timestamp = new Date(timestamp_str);
-        return new Date(timestamp.getTime() - currentDate.getTimezoneOffset() * 60000);  // Convert min to ms
+        var $canvas = $('<canvas>');
+        var $context = $canvas[0].getContext('2d');
+        new chart.Chart($context, {
+            type: 'line',
+            data: {
+                datasets: [{
+                    label: 'Measurements',
+                    backgroundColor: 'rgba(255, 0, 0, 0.1)',
+                    borderColor: 'rgba(255, 0, 0, 0.5)',
+                    borderWidth: 1,
+                    data: data
+                }]
+            },
+            options: {
+                scales: {
+                    xAxes: [{
+                        type: 'time',
+                        scaleLabel: {
+                            display: true,
+                            labelString: 'Date'
+                        }
+                    }],
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero:true
+                        }
+                    }]
+                }
+            }
+        });
+
+        return $canvas;
     }
 });
