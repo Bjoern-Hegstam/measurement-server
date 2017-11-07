@@ -2,14 +2,18 @@ define(['jquery', 'app/db/measurement'], function ($, db) {
 
     db.getSources()
         .done(function (sources) {
-            clearTables();
             sources.forEach(function (source) {
                 var createdAfter = new Date();
                 createdAfter.setDate(createdAfter.getDate() - 7); // One week ago
 
                 getMeasurements(source, {createdAfter: createdAfter})
                     .then(function (measurements) {
-                        updateTable(source, measurements)
+                        var $dataTable = createTable(measurements);
+                        var $container = $('<div>').append(
+                            $('<p>').text(source.name),
+                            $dataTable
+                        );
+                        $('#dashboard-container').append($container);
                     });
             })
         });
@@ -44,11 +48,7 @@ define(['jquery', 'app/db/measurement'], function ($, db) {
             })
     }
 
-    function clearTables() {
-        $('#dashboard-container').empty();
-    }
-
-    function updateTable(source, measurements) {
+    function createTable(measurements) {
         var $dataTable = $('<table>', {'class': 'data-table'});
 
         // Table header
@@ -73,13 +73,7 @@ define(['jquery', 'app/db/measurement'], function ($, db) {
             );
         });
 
-        // Show user new table
-        var $container = $('<div>').append(
-            $('<p>').text(source.name),
-            $dataTable
-        );
-
-        $('#dashboard-container').append($container);
+        return $dataTable;
     }
 
     function formatTimestamp(timestamp_str) {
