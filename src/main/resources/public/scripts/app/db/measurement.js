@@ -4,7 +4,7 @@ define(['jquery'], function ($) {
             return $.get({
                 url: '/api/sources',
                 dataType: 'json'
-            })
+            });
         },
 
         getMeasurements: function (source, args) {
@@ -16,7 +16,7 @@ define(['jquery'], function ($) {
             return $.get({
                 url: url,
                 dataType: 'json'
-            })
+            });
         }
     }
 });
