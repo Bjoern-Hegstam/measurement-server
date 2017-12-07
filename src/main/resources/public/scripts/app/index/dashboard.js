@@ -102,7 +102,8 @@ define(['jquery',  'chart', 'app/db/measurement'], function ($, chart, db) {
                     backgroundColor: 'rgba(255, 0, 0, 0.1)',
                     borderColor: 'rgba(255, 0, 0, 0.5)',
                     borderWidth: 1,
-                    data: data
+                    data: data,
+                    lineTension: 0
                 }]
             },
             options: {
