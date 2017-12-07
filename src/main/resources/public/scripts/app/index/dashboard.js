@@ -18,7 +18,7 @@ define(['jquery',  'chart', 'app/db/measurement'], function ($, chart, db) {
                         var $container = $('<div>').append(
                             $('<p>', {class: 'source-header'}).text(source.name),
                             $graph,
-                            $dataTable
+                            $('<details>').append($dataTable)
                         );
                         $('#dashboard-container').append($container);
                     });
