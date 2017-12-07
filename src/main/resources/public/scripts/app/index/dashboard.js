@@ -2,6 +2,10 @@ define(['jquery',  'chart', 'app/db/measurement'], function ($, chart, db) {
 
     db.getSources()
         .done(function (sources) {
+            sources.sort(function (a, b) {
+                return a.name.localeCompare(b.name);
+            });
+
             sources.forEach(function (source) {
                 var createdAfter = new Date();
                 createdAfter.setDate(createdAfter.getDate() - 7); // One week ago
