@@ -139,6 +139,7 @@
                     <url>${db.url}</url>
                     <user>${db.user}</user>
                     <password>${db.password}</password>
+                    <table>schema_version</table>
                 </configuration>
             </plugin>
 
