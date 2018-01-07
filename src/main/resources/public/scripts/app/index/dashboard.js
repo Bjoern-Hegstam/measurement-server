@@ -15,13 +15,9 @@ define(['jquery',  'chart', 'app/db/measurement'], function ($, chart, db) {
 
                 getMeasurements(source, {createdAfter: createdAfter})
                     .then(function (measurements) {
-                        var $dataTable = createTable(measurements);
-                        var $graph = createGraph(measurements);
-
                         $container.append(
                             $('<p>', {class: 'source-header'}).text(source.name),
-                            $graph,
-                            $('<details>').append($dataTable)
+                            createGraph(measurements)
                         );
                     });
             })
@@ -55,34 +51,6 @@ define(['jquery',  'chart', 'app/db/measurement'], function ($, chart, db) {
                     });
                 }
             })
-    }
-
-    function createTable(measurements) {
-        var $dataTable = $('<table>', {class: 'data-table'});
-
-        // Table header
-        $dataTable.append(
-            $('<thead>').append(
-                $('<td>').text('Source'),
-                $('<td>').text('Type'),
-                $('<td>').text('Value'),
-                $('<td>').text('Created at')
-            )
-        );
-
-        // Measurement rows
-        measurements.forEach(function (measurement) {
-            $dataTable.append(
-                $('<tr>').append(
-                    $('<td>').text(measurement.source.name),
-                    $('<td>').text(measurement.type),
-                    $('<td>').text(measurement.value),
-                    $('<td>').text(new Date(measurement.createdAtMillis).toLocaleString())
-                )
-            );
-        });
-
-        return $dataTable;
     }
 
     function createGraph(measurements) {
