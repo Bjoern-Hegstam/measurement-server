@@ -7,6 +7,9 @@ define(['jquery',  'chart', 'app/db/measurement'], function ($, chart, db) {
             });
 
             sources.forEach(function (source) {
+                var $container = $('<div>');
+                $('#dashboard-container').append($container);
+
                 var createdAfter = new Date();
                 createdAfter.setDate(createdAfter.getDate() - 7); // One week ago
 
@@ -15,12 +18,11 @@ define(['jquery',  'chart', 'app/db/measurement'], function ($, chart, db) {
                         var $dataTable = createTable(measurements);
                         var $graph = createGraph(measurements);
 
-                        var $container = $('<div>').append(
+                        $container.append(
                             $('<p>', {class: 'source-header'}).text(source.name),
                             $graph,
                             $('<details>').append($dataTable)
                         );
-                        $('#dashboard-container').append($container);
                     });
             })
         });
