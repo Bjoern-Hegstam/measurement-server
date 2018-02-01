@@ -47,7 +47,7 @@ public class MeasurementApiController implements Controller {
         http.post(Path.Api.MEASUREMENTS, AcceptType.APPLICATION_JSON, asSparkRoute(this::postMeasurement), jsonResponseTransformer);
     }
 
-    Result getSources(Request request) {
+    private Result getSources(Request request) {
         QueryResult<String> queryResult = measurementRepository.findSources();
         return resultFromQueryResult(queryResult, MeasurementSource::new);
     }
@@ -72,7 +72,7 @@ public class MeasurementApiController implements Controller {
                 );
     }
 
-    Result postMeasurement(Request request) {
+    private Result postMeasurement(Request request) {
         MeasurementBean measurement = MeasurementBean.fromJson(request.body());
         measurement.setCreatedAtMillis(System.currentTimeMillis());
 

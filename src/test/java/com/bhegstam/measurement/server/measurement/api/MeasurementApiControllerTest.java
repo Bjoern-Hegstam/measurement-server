@@ -5,35 +5,31 @@ import com.bhegstam.measurement.server.db.QueryResult;
 import com.bhegstam.measurement.server.measurement.db.MeasurementRepository;
 import com.bhegstam.measurement.server.web.PaginationHeader;
 import com.bhegstam.webutil.webapp.Result;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ErrorCollector;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 
 import static com.bhegstam.util.Mocks.mockRequest;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class MeasurementApiControllerTest {
-
-    @Rule
-    public ErrorCollector errorCollector = new ErrorCollector();
+class MeasurementApiControllerTest {
 
     private MeasurementRepository repository;
     private MeasurementApiController controller;
 
-    @Before
-    public void setUp() throws Exception {
+    @BeforeEach
+    void setUp() {
         repository = mock(MeasurementRepository.class);
         controller = new MeasurementApiController(repository);
     }
 
     @Test
-    public void getMeasurements_pagination_headers() {
+    void getMeasurements_pagination_headers() {
         // given
         when(repository.find(any(), any())).thenReturn(
                 new QueryResult<>(
@@ -55,6 +51,6 @@ public class MeasurementApiControllerTest {
     }
 
     private void checkHeader(Result result, String header, String expectedValue) {
-        errorCollector.checkThat(header, result.getHeaders().get(header), is(expectedValue));
+        assertThat(header, result.getHeaders().get(header), is(expectedValue));
     }
 }

@@ -1,13 +1,13 @@
 package com.bhegstam.measurement.server.db;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class SqlBuilderTest {
+class SqlBuilderTest {
 
     @Test
-    public void simple_query() {
+    void simple_query() {
         // given
         SqlQueryData queryData = new SqlBuilder()
                 .append(Sql.SELECT)
