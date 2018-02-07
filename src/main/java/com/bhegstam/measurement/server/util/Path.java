@@ -6,7 +6,7 @@ public class Path {
     }
 
     public static class Template {
-        public static final String INDEX = "/velocity/index.vm";
+        public static final String INDEX = "/index.html";
     }
 
     public static class Api {

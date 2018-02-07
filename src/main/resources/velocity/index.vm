@@ -1,6 +1,0 @@
-#parse("/velocity/layout.vm")
-#@mainLayout("app/index/dashboard")
-    <div id="dashboard-container">
-    </div>
-
-#end
