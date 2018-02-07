@@ -13,33 +13,28 @@ function getMeasurements(source, args) {
 
     return db
         .getMeasurements(source.name, {page: args.page})
-        .then(function (newMeasurements, textStatus, jqXHR) {
+        .then((newMeasurements, textStatus, jqXHR) => {
             const measurements = args.measurements.concat(newMeasurements);
             const existsMore = jqXHR.getResponseHeader('X-Next-Page') !== null;
             const lastRetrievedCreatedAfterCutoff = new Date(measurements[measurements.length - 1].createdAtMillis) > args.createdAfter;
 
             if (existsMore && lastRetrievedCreatedAfterCutoff) {
                 return getMeasurements(source, {
-                    measurements: measurements,
+                    measurements,
                     page: args.page + 1,
                     createdAfter: args.createdAfter
                 });
-            } else {
-                return measurements.filter(function (m) {
-                    return new Date(m.createdAtMillis) > args.createdAfter;
-                });
             }
+
+            return measurements.filter(m => new Date(m.createdAtMillis) > args.createdAfter);
         })
 }
 
 function createGraph(measurements) {
-    const data = [];
-    measurements.forEach(function (m) {
-        data.push({
-            x: new Date(m.createdAtMillis),
-            y: m.value
-        });
-    });
+    const data = measurements.map(m => ({
+        x: new Date(m.createdAtMillis),
+        y: m.value
+    }));
 
     const $canvas = $('<canvas>');
     const $context = $canvas[0].getContext('2d');
@@ -78,20 +73,18 @@ function createGraph(measurements) {
 
 $(document).ready(() => {
     db.getSources()
-        .done(function (sources) {
-            sources.sort(function (a, b) {
-                return a.name.localeCompare(b.name);
-            });
+        .done(sources => {
+            sources.sort((a, b) => a.name.localeCompare(b.name));
 
-            sources.forEach(function (source) {
+            sources.forEach(source => {
                 const $container = $('<div>');
                 $('#dashboard-container').append($container);
 
                 const createdAfter = new Date();
                 createdAfter.setDate(createdAfter.getDate() - 7); // One week ago
 
-                getMeasurements(source, {createdAfter: createdAfter})
-                    .then(function (measurements) {
+                getMeasurements(source, {createdAfter})
+                    .then(measurements => {
                         $container.append(
                             $('<p>', {class: 'source-header'}).text(source.name),
                             createGraph(measurements)
