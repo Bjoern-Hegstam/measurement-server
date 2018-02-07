@@ -1,6 +1,6 @@
-var $ = require('jquery');
-var chart = require('chart.js');
-var db = require('./db/measurement');
+import $ from "jquery";
+import chart from "chart.js";
+import db from "./db/measurement";
 
 function getMeasurements(source, args) {
     if (!args.hasOwnProperty('measurements')) {
@@ -14,9 +14,9 @@ function getMeasurements(source, args) {
     return db
         .getMeasurements(source.name, {page: args.page})
         .then(function (newMeasurements, textStatus, jqXHR) {
-            var measurements = args.measurements.concat(newMeasurements);
-            var existsMore = jqXHR.getResponseHeader('X-Next-Page') !== null;
-            var lastRetrievedCreatedAfterCutoff = new Date(measurements[measurements.length - 1].createdAtMillis) > args.createdAfter;
+            const measurements = args.measurements.concat(newMeasurements);
+            const existsMore = jqXHR.getResponseHeader('X-Next-Page') !== null;
+            const lastRetrievedCreatedAfterCutoff = new Date(measurements[measurements.length - 1].createdAtMillis) > args.createdAfter;
 
             if (existsMore && lastRetrievedCreatedAfterCutoff) {
                 return getMeasurements(source, {
@@ -33,7 +33,7 @@ function getMeasurements(source, args) {
 }
 
 function createGraph(measurements) {
-    var data = [];
+    const data = [];
     measurements.forEach(function (m) {
         data.push({
             x: new Date(m.createdAtMillis),
@@ -41,8 +41,8 @@ function createGraph(measurements) {
         });
     });
 
-    var $canvas = $('<canvas>');
-    var $context = $canvas[0].getContext('2d');
+    const $canvas = $('<canvas>');
+    const $context = $canvas[0].getContext('2d');
     new chart.Chart($context, {
         type: 'line',
         data: {
@@ -76,7 +76,7 @@ function createGraph(measurements) {
     return $canvas;
 }
 
-$(document).ready(function () {
+$(document).ready(() => {
     db.getSources()
         .done(function (sources) {
             sources.sort(function (a, b) {
@@ -84,10 +84,10 @@ $(document).ready(function () {
             });
 
             sources.forEach(function (source) {
-                var $container = $('<div>');
+                const $container = $('<div>');
                 $('#dashboard-container').append($container);
 
-                var createdAfter = new Date();
+                const createdAfter = new Date();
                 createdAfter.setDate(createdAfter.getDate() - 7); // One week ago
 
                 getMeasurements(source, {createdAfter: createdAfter})
