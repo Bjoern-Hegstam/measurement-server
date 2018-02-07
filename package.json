@@ -1,0 +1,26 @@
+{
+  "name": "measurement-server",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "webpack"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Bjoern-Hegstam/measurement-server.git"
+  },
+  "author": "Björn Hegstam",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Bjoern-Hegstam/measurement-server/issues"
+  },
+  "homepage": "https://github.com/Bjoern-Hegstam/measurement-server#readme",
+  "dependencies": {
+    "chart.js": "2.7.1",
+    "jquery": "3.3.1"
+  },
+  "devDependencies": {
+    "webpack": "3.10.0"
+  }
+}

@@ -16,21 +16,7 @@ $bodyContent
 
 </body>
 
-<script src="/scripts/require.js"></script>
-<script>
-    requirejs.config({
-        baseUrl: '/scripts',
-        paths: {
-            jquery: 'lib/jquery-3.2.1.min',
-            chart: 'lib/Chart.bundle.min'
-        }
-    });
-
-    require(['main']);
-        #if($scriptModules)
-        require(['$scriptModules']);
-        #end
-</script>
+<script src="/scripts/bundle.js"></script>
 
 </html>
 #end
