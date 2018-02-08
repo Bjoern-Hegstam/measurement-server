@@ -1,8 +1,8 @@
 import $ from "jquery";
 import chart from "chart.js";
-import db from "./db/measurement";
+import { getMeasurements, getSources } from "./db/measurement";
 
-function getMeasurements(source, args) {
+function getAllMeasurements(source, args) {
     if (!args.hasOwnProperty('measurements')) {
         args.measurements = []
     }
@@ -11,15 +11,14 @@ function getMeasurements(source, args) {
         args.page = 1;
     }
 
-    return db
-        .getMeasurements(source.name, {page: args.page})
+    return getMeasurements(source.name, {page: args.page})
         .then((newMeasurements, textStatus, jqXHR) => {
             const measurements = args.measurements.concat(newMeasurements);
             const existsMore = jqXHR.getResponseHeader('X-Next-Page') !== null;
             const lastRetrievedCreatedAfterCutoff = new Date(measurements[measurements.length - 1].createdAtMillis) > args.createdAfter;
 
             if (existsMore && lastRetrievedCreatedAfterCutoff) {
-                return getMeasurements(source, {
+                return getAllMeasurements(source, {
                     measurements,
                     page: args.page + 1,
                     createdAfter: args.createdAfter
@@ -72,7 +71,7 @@ function createGraph(measurements) {
 }
 
 $(document).ready(() => {
-    db.getSources()
+    getSources()
         .done(sources => {
             sources.sort((a, b) => a.name.localeCompare(b.name));
 
@@ -83,7 +82,7 @@ $(document).ready(() => {
                 const createdAfter = new Date();
                 createdAfter.setDate(createdAfter.getDate() - 7); // One week ago
 
-                getMeasurements(source, {createdAfter})
+                getAllMeasurements(source, {createdAfter})
                     .then(measurements => {
                         $container.append(
                             $('<p>', {class: 'source-header'}).text(source.name),
