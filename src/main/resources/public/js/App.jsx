@@ -36,7 +36,7 @@ class App extends React.Component {
     renderMeasurementSources() {
         return this.props
             .measurementSources
-            .map(source => <MeasurementSourceView sourceName={source.name} dispatch={this.props.dispatch}/>);
+            .map(source => <MeasurementSourceView key={source.name} sourceName={source.name} dispatch={this.props.dispatch}/>);
     }
 }
 
