@@ -12,3 +12,16 @@ export function getMeasurementSources() {
         }
     }
 }
+
+export function getMeasurements(sourceName) {
+    return {
+        type: types.GET_MEASUREMENTS,
+        payload: {
+            request: {
+                method: 'get',
+                url: `/sources/${sourceName}/measurements`,
+                responseType: 'json'
+            }
+        }
+    }
+}
