@@ -1,6 +1,8 @@
 import {combineReducers} from 'redux';
-import measurements from './MeasurementsReducer';
+import sources from './MeasurementSourcesReducer';
+import measurementsBySource from './MeasurementsReducer';
 
 export default combineReducers({
-    measurements
+    sources,
+    measurementsBySource
 });

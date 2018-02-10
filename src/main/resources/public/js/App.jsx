@@ -42,6 +42,6 @@ class App extends React.Component {
 
 export default connect(store => {
     return {
-        measurementSources: store.measurements.sources
+        measurementSources: store.sources
     }
 })(App);
