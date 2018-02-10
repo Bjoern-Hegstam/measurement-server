@@ -1,6 +1,6 @@
 import {combineReducers} from 'redux';
-import sensorReducer from './SensorReducer';
+import measurements from './MeasurementsReducer';
 
 export default combineReducers({
-    sensorReducer
+    measurements
 });

@@ -1,0 +1,14 @@
+import types from "./types";
+
+export function getMeasurementSources() {
+    return {
+        type: types.GET_MEASUREMENT_SOURCES,
+        payload: {
+            request: {
+                method: 'get',
+                url: '/sources',
+                responseType: 'json'
+            }
+        }
+    }
+}
