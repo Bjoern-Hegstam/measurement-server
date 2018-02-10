@@ -16,6 +16,9 @@ export function getMeasurementSources() {
 export function getMeasurements(sourceName) {
     return {
         type: types.GET_MEASUREMENTS,
+        queryInfo: {
+            sourceName
+        },
         payload: {
             request: {
                 method: 'get',

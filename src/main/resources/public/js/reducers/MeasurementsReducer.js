@@ -32,13 +32,13 @@ export default function (state = initialState, action) {
                 error: action.error
             };
         case types.GET_MEASUREMENTS:
+            // TODO: Read action.queryInfo.sourceName and store isFetching and error per source
             return {
                 ...state,
                 isFetching: true,
                 error: null
             };
         case types.GET_MEASUREMENTS_SUCCESS:
-            // TODO: Merge with existing measurements
             const measurements = action.payload.data;
             const measurementsPerSource = state.measurementsPerSource;
             if (measurements.length > 0) {
