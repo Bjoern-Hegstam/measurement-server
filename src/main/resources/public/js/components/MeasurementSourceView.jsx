@@ -1,4 +1,5 @@
 import React from "react";
+import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
 import {getMeasurements} from "../actions/MeasurementsActions";
 import ChartGraph from './Chart';
@@ -6,23 +7,17 @@ import ChartGraph from './Chart';
 class MeasurementSourceView extends React.Component {
     static propTypes = {
         sourceName: PropTypes.string.isRequired,
-        dispatch: PropTypes.func.isRequired
+        dispatch: PropTypes.func.isRequired,
+
+        measurements: PropTypes.arrayOf(PropTypes.object)
     };
 
-    constructor(props) {
-        super(props);
-        this.state = {
-            measurements: []
-        };
-    }
+    static defaultProps = {
+        measurements: []
+    };
 
     componentDidMount() {
-        this.props.dispatch(getMeasurements(this.props.sourceName))
-            .then((response) => {
-                this.setState({
-                    measurements: response.payload.data
-                });
-            })
+        this.props.dispatch(getMeasurements(this.props.sourceName));
     }
 
     render() {
@@ -35,7 +30,7 @@ class MeasurementSourceView extends React.Component {
     }
 
     renderMeasurementsGraph() {
-        const data = this.state.measurements
+        const data = this.props.measurements
             .map(m => ({
                 x: new Date(m.createdAtMillis),
                 y: m.value
@@ -73,4 +68,8 @@ class MeasurementSourceView extends React.Component {
     }
 }
 
-export default MeasurementSourceView;
+export default connect((state, ownProps) => {
+    return {
+        measurements: ownProps.sourceName in state.measurementsBySource ? state.measurementsBySource[ownProps.sourceName].data : []
+    }
+})(MeasurementSourceView);
