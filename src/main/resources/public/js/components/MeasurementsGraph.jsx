@@ -1,28 +1,31 @@
 import React from "react";
 import PropTypes from 'prop-types';
 import ChartGraph from "./Chart";
+import {MeasurementType} from "../types";
 
 export default class MeasurementsGraph extends React.Component {
     static propTypes = {
-        data: PropTypes.arrayOf(PropTypes.shape({
-                x: PropTypes.number,
-                y: PropTypes.number,
-            })
-        )
+        measurements: PropTypes.arrayOf(MeasurementType)
     };
 
     static defaultProps = {
-        data: []
+        measurements: []
     };
 
     render () {
+        const data = this.props.measurements
+            .map(m => ({
+                x: new Date(m.createdAtMillis),
+                y: m.value
+            }));
+
         const chartData = {
             datasets: [{
                 label: 'Measurements',
                 backgroundColor: 'rgba(255, 0, 0, 0.1)',
                 borderColor: 'rgba(255, 0, 0, 0.5)',
                 borderWidth: 1,
-                data: this.props.data,
+                data,
                 lineTension: 0
             }]
         };

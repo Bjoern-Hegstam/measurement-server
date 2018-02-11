@@ -3,22 +3,14 @@ import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
 import {getMeasurements} from "../actions/MeasurementsActions";
 import MeasurementsGraph from './MeasurementsGraph';
+import {MeasurementType} from "../types";
 
 class MeasurementSourceView extends React.Component {
     static propTypes = {
         sourceName: PropTypes.string.isRequired,
         dispatch: PropTypes.func.isRequired,
 
-        measurements: PropTypes.arrayOf(PropTypes.shape({
-                source: PropTypes.shape({
-                    name: PropTypes.string
-                }),
-                createdAtMillis: PropTypes.number,
-                type: PropTypes.string,
-                value: PropTypes.number,
-                unit: PropTypes.string
-            })
-        )
+        measurements: PropTypes.arrayOf(MeasurementType)
     };
 
     static defaultProps = {
@@ -30,16 +22,10 @@ class MeasurementSourceView extends React.Component {
     }
 
     render() {
-        const data = this.props.measurements
-            .map(m => ({
-                x: new Date(m.createdAtMillis),
-                y: m.value
-            }));
-
         return (
             <div>
                 <p className="source-header">{this.props.sourceName}</p>
-                <MeasurementsGraph data={data}/>;
+                <MeasurementsGraph measurements={this.props.measurements}/>;
             </div>
         )
     }
