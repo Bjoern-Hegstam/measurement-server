@@ -9,6 +9,7 @@ import java.sql.*;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Consumer;
 
 public class MeasurementRepository {
@@ -23,6 +24,8 @@ public class MeasurementRepository {
     }
 
     public QueryResult<Measurement> find(String source, PaginationSettings paginationSettings) {
+        Objects.requireNonNull(source);
+
         logger.debug("Finding measurements");
 
         List<Measurement> measurements = new ArrayList<>();
@@ -37,6 +40,10 @@ public class MeasurementRepository {
                             .append(Sql.count(Measurement.DB.ID))
                             .append(Sql.FROM)
                             .append(Measurement.DB.TABLE_NAME)
+                            .append(Sql.WHERE)
+                            .append(Measurement.DB.SOURCE)
+                            .append(Sql.EQUALS)
+                            .appendParametrizedValue(source)
                             .build()
             );
 
@@ -59,12 +66,10 @@ public class MeasurementRepository {
             sqlBuilder.append(Sql.FROM)
                       .append(Measurement.DB.TABLE_NAME);
 
-            if (source != null) {
-                sqlBuilder.append(Sql.WHERE)
-                          .append(Measurement.DB.SOURCE)
-                          .append(Sql.EQUALS)
-                          .appendParametrizedValue(source);
-            }
+            sqlBuilder.append(Sql.WHERE)
+                      .append(Measurement.DB.SOURCE)
+                      .append(Sql.EQUALS)
+                      .appendParametrizedValue(source);
 
             sqlBuilder.append(Sql.ORDER_BY)
                       .append(Measurement.DB.TIMESTAMP)
@@ -184,8 +189,9 @@ public class MeasurementRepository {
         logger.debug(totalCountQueryData);
 
         final int totalCount;
-        try (Statement statement = conn.createStatement()) {
-            ResultSet rs = statement.executeQuery(totalCountQueryData.getQuery());
+        try (PreparedStatement statement = conn.prepareStatement(totalCountQueryData.getQuery())) {
+            totalCountQueryData.setValues(statement);
+            ResultSet rs = statement.executeQuery();
             rs.next();
             totalCount = rs.getInt(1);
             logger.debug("Count (total): " + totalCount);
