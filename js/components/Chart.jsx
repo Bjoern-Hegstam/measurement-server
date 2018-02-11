@@ -20,7 +20,7 @@ export default class ChartGraph extends React.Component {
         this.setState({chart: myChart});
     }
 
-    componentDidUpdate () {
+    componentDidUpdate() {
         let chart = this.state.chart;
         let data = this.props.data;
 
