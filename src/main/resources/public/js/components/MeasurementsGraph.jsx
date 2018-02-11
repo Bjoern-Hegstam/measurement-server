@@ -34,6 +34,12 @@ export default class MeasurementsGraph extends React.Component {
             scales: {
                 xAxes: [{
                     type: 'time',
+                    time: {
+                        unit: 'day',
+                        displayFormats: {
+                            day: 'dddd D/M'
+                        }
+                    },
                     scaleLabel: {
                         display: true,
                         labelString: 'Date'
@@ -41,7 +47,8 @@ export default class MeasurementsGraph extends React.Component {
                 }],
                 yAxes: [{
                     ticks: {
-                        beginAtZero: true
+                        beginAtZero: true,
+                        suggestedMax: 1000
                     }
                 }]
             }
