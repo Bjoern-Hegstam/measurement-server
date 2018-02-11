@@ -7,6 +7,8 @@ import axios from 'axios';
 import axiosMiddleware from 'redux-axios-middleware';
 import App from "./App";
 
+require('./main.less');
+
 const client = axios.create({
     baseURL: '/api'
 });
