@@ -14,7 +14,7 @@ function measurements(state = {
     latestTimestamp: null,
     data: []
 }, action) {
-    switch (action) {
+    switch (action.type) {
         case types.GET_MEASUREMENTS:
             return {
                 ...state,
