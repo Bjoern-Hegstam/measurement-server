@@ -13,7 +13,7 @@ export function getMeasurementSources() {
     }
 }
 
-export function getMeasurements(sourceName) {
+export function getMeasurements(sourceName, perPage=100, page=1) {
     return {
         type: types.GET_MEASUREMENTS,
         queryInfo: {
@@ -22,7 +22,7 @@ export function getMeasurements(sourceName) {
         payload: {
             request: {
                 method: 'get',
-                url: `/sources/${sourceName}/measurements`,
+                url: `/sources/${sourceName}/measurements?per_page=${perPage}&page=${page}`,
                 responseType: 'json'
             }
         }
