@@ -8,8 +8,8 @@ import com.bhegstam.webutil.webapp.ApplicationBase;
 import com.google.inject.Guice;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
-
 import spark.Service;
+
 import java.util.Optional;
 
 import static java.util.Collections.singletonList;
@@ -47,6 +47,10 @@ public class Application extends ApplicationBase {
 
         http.staticFiles.location("/public");
         http.staticFiles.expireTime(600);
+
+        http.after((request, response) -> {
+            response.header("Content-Encoding", "gzip");
+        });
     }
 
     private int getPort() {
