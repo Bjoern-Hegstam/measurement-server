@@ -1,4 +1,6 @@
 ### Unreleased
+
+### 3.2
 * gzip all responses
 * Update mockito version
 * Add README
