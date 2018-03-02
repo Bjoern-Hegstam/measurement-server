@@ -17,7 +17,7 @@ class MeasurementSourceView extends React.Component {
     };
 
     componentDidMount() {
-        this.props.dispatch(getMeasurements(this.props.sourceName));
+        this.props.getMeasurements();
     }
 
     render() {
@@ -33,7 +33,7 @@ class MeasurementSourceView extends React.Component {
 export default connect(
     (state, ownProps) => ({
         measurements: ownProps.sourceName in state.measurementsBySource ? state.measurementsBySource[ownProps.sourceName].data : []
-    }), {
-        getMeasurements
-    }
+    }), (dispatch, ownProps) => ({
+        getMeasurements: () => dispatch(getMeasurements(ownProps.sourceName))
+    })
 )(MeasurementSourceView);
