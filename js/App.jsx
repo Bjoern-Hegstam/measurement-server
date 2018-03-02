@@ -6,12 +6,12 @@ import MeasurementSourceView from './components/MeasurementSourceView';
 
 class App extends React.Component {
     static propTypes = {
+        getMeasurementSources: PropTypes.func.isRequired,
         measurementSources: PropTypes.arrayOf(
             PropTypes.shape({
                 name: PropTypes.string
             })
-        ),
-        dispatch: PropTypes.func.isRequired
+        )
     };
 
     static defaultProps = {
@@ -19,7 +19,8 @@ class App extends React.Component {
     };
 
     componentDidMount() {
-        this.props.dispatch(getMeasurementSources())
+        this.props
+            .getMeasurementSources()
             .catch(response => {
                 console.log(`Error while loading data: ${response}`);
             });
@@ -34,14 +35,17 @@ class App extends React.Component {
     }
 
     renderMeasurementSources() {
-        return this.props
+        return this
+            .props
             .measurementSources
-            .map(source => <MeasurementSourceView key={source.name} sourceName={source.name} dispatch={this.props.dispatch}/>);
+            .map(source => <MeasurementSourceView key={source.name} sourceName={source.name}/>);
     }
 }
 
-export default connect(store => {
-    return {
+export default connect(
+    store => ({
         measurementSources: store.sources
+    }), {
+        getMeasurementSources
     }
-})(App);
+)(App);

@@ -8,8 +8,7 @@ import {MeasurementType} from "../types";
 class MeasurementSourceView extends React.Component {
     static propTypes = {
         sourceName: PropTypes.string.isRequired,
-        dispatch: PropTypes.func.isRequired,
-
+        getMeasurements: PropTypes.func.isRequired,
         measurements: PropTypes.arrayOf(MeasurementType)
     };
 
@@ -31,8 +30,10 @@ class MeasurementSourceView extends React.Component {
     }
 }
 
-export default connect((state, ownProps) => {
-    return {
+export default connect(
+    (state, ownProps) => ({
         measurements: ownProps.sourceName in state.measurementsBySource ? state.measurementsBySource[ownProps.sourceName].data : []
+    }), {
+        getMeasurements
     }
-})(MeasurementSourceView);
+)(MeasurementSourceView);
