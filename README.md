@@ -4,7 +4,7 @@
 * Add README
 * Save redux store to localStorage
 
-### 3.0.1
+### 3.1
 * Refactor project structure (keep front end and back end code separate)
 * Bugfix: JUnit 5 tests were not run by maven surefire
 
