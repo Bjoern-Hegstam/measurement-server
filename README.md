@@ -2,6 +2,7 @@
 * gzip all responses
 * Update mockito version
 * Add README
+* Save redux store to localStorage
 
 ### 3.0.1
 * Refactor project structure (keep front end and back end code separate)
