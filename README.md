@@ -1,4 +1,5 @@
 ### Unreleased
+* Upgrade dependencies
 
 ### 3.2
 * gzip all responses
