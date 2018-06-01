@@ -1,7 +1,6 @@
 const path = require('path');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const ReactRootPlugin = require('html-webpack-react-root-plugin');
 
 module.exports = {
     entry: './js/index.jsx',
@@ -43,7 +42,11 @@ module.exports = {
     },
     plugins: [
         new CleanWebpackPlugin(['dist']),
-        new HtmlWebpackPlugin({title: 'Plant monitor'}),
-        new ReactRootPlugin()
+        new HtmlWebpackPlugin({
+            title: 'Plant monitor',
+            inject: false,
+            template: require('html-webpack-template'),
+            appMountId: 'root'
+        })
     ]
 };
