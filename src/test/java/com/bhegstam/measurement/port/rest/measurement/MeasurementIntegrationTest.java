@@ -3,17 +3,18 @@ package com.bhegstam.measurement.port.rest.measurement;
 import com.bhegstam.measurement.configuration.MeasurementServerApplicationConfiguration;
 import com.bhegstam.measurement.db.PaginationInformation;
 import com.bhegstam.measurement.domain.MeasurementRepository;
-import com.bhegstam.measurement.port.persistence.RepositoryFactory;
 import com.bhegstam.measurement.port.rest.JsonMapper;
 import com.bhegstam.measurement.util.DropwizardAppRuleFactory;
 import com.bhegstam.measurement.util.TestDatabaseSetup;
 import com.fasterxml.jackson.databind.JsonNode;
 import io.dropwizard.testing.junit.DropwizardAppRule;
-import org.junit.Before;
-import org.junit.ClassRule;
 import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.migrationsupport.rules.ExternalResourceSupport;
 
+import javax.inject.Inject;
 import javax.ws.rs.core.Response;
 import java.time.Instant;
 
@@ -23,32 +24,30 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 
+@ExtendWith(ExternalResourceSupport.class)
+@ExtendWith(TestDatabaseSetup.class)
 public class MeasurementIntegrationTest {
     private static final String TYPE = "TYPE";
     private static final String UNIT = "UNIT";
     private static final String SOURCE_1_ID = "s1";
     private static final String SOURCE_2_ID = "s2";
 
-    @ClassRule
+    @Rule
     public static final DropwizardAppRule<MeasurementServerApplicationConfiguration> service = DropwizardAppRuleFactory.forIntegrationTest();
 
-    @Rule
-    public TestDatabaseSetup testDatabaseSetup = new TestDatabaseSetup();
-
+    @Inject
     private MeasurementRepository measurementRepository;
     private MeasurementApi api;
     private final JsonMapper jsonMapper = new JsonMapper();
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         String serviceUrl = "http://localhost:" + service.getLocalPort() + "/api/";
-        RepositoryFactory repositoryFactory = new RepositoryFactory(service.getEnvironment(), service.getConfiguration().getDataSourceFactory());
-        measurementRepository = repositoryFactory.createMeasurementRepository();
         api = new MeasurementApi(serviceUrl);
     }
 
     @Test
-    public void getSources_emptyDb() {
+    void getSources_emptyDb() {
         // when
         Response response = api.getSources();
 
@@ -60,10 +59,10 @@ public class MeasurementIntegrationTest {
     }
 
     @Test
-    public void getSources() {
+    void getSources() {
         // given
-        measurementRepository.addMeasurement(SOURCE_1_ID, Instant.now().toEpochMilli(), TYPE, 1.0, UNIT);
-        measurementRepository.addMeasurement(SOURCE_2_ID, Instant.now().toEpochMilli(), TYPE, 1.0, UNIT);
+        measurementRepository.addMeasurement(SOURCE_1_ID, Instant.now(), TYPE, 1.0, UNIT);
+        measurementRepository.addMeasurement(SOURCE_2_ID, Instant.now(), TYPE, 1.0, UNIT);
 
         // when
         Response response = api.getSources();
@@ -79,7 +78,7 @@ public class MeasurementIntegrationTest {
     }
 
     @Test
-    public void getMeasurements_emptyDb() {
+    void getMeasurements_emptyDb() {
         // when
         Response response = api.getMeasurements("id", 40, 1);
 
@@ -94,7 +93,7 @@ public class MeasurementIntegrationTest {
     }
 
     @Test
-    public void getMeasurements() {
+    void getMeasurements() {
         // given
         insertMeasurements(SOURCE_1_ID, 100);
         insertMeasurements(SOURCE_2_ID, 100);
@@ -113,7 +112,7 @@ public class MeasurementIntegrationTest {
 
     private void insertMeasurements(String sourceId, int count) {
         for (int i = 0; i < count; i++) {
-            measurementRepository.addMeasurement(sourceId, Instant.now().toEpochMilli(), TYPE, i, UNIT);
+            measurementRepository.addMeasurement(sourceId, Instant.now(), TYPE, i, UNIT);
         }
     }
 
@@ -125,6 +124,7 @@ public class MeasurementIntegrationTest {
         checkHeader(response, PaginationHeader.PREV_PAGE, paginationInformation.getPrevPage().orElse(null));
         checkHeader(response, PaginationHeader.PER_PAGE, paginationInformation.getPerPage());
     }
+
     private void checkHeader(Response response, String header, Integer expectedValue) {
         if (expectedValue != null) {
             assertThat(header, response.getHeaderString(header), is(Integer.toString(expectedValue)));

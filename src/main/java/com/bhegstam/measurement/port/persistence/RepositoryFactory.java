@@ -13,6 +13,10 @@ public class RepositoryFactory {
         jdbi = new JdbiFactory().build(environment, dataSourceFactory, "datasource");
     }
 
+    public Jdbi getJdbi() {
+        return jdbi;
+    }
+
     public MeasurementRepository createMeasurementRepository() {
         return jdbi.onDemand(JdbiMeasurementRepository.class);
     }

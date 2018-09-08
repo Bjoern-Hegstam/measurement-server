@@ -2,6 +2,7 @@ package com.bhegstam.measurement.util;
 
 import com.bhegstam.measurement.configuration.DbMigrationBundle;
 import com.bhegstam.measurement.configuration.MeasurementServerApplicationConfiguration;
+import com.bhegstam.measurement.domain.MeasurementRepository;
 import com.bhegstam.measurement.port.persistence.RepositoryFactory;
 import com.codahale.metrics.MetricRegistry;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
@@ -13,29 +14,34 @@ import io.dropwizard.jackson.Jackson;
 import io.dropwizard.setup.Environment;
 import io.dropwizard.testing.ResourceHelpers;
 import io.dropwizard.validation.BaseValidator;
-import org.junit.rules.TestRule;
-import org.junit.runner.Description;
-import org.junit.runners.model.Statement;
+import org.jdbi.v3.core.Jdbi;
+import org.junit.jupiter.api.extension.BeforeEachCallback;
+import org.junit.jupiter.api.extension.ExtensionContext;
+import org.junit.jupiter.api.extension.TestInstancePostProcessor;
 
+import javax.inject.Inject;
+import java.lang.reflect.Field;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Map;
 
 import static java.util.Arrays.asList;
 
-public class TestDatabaseSetup implements TestRule {
+public class TestDatabaseSetup implements BeforeEachCallback, TestInstancePostProcessor {
     private static final List<String> CLEANUP_SQL_STATEMENTS = asList(
             "delete from measurement"
     );
 
-    private final RepositoryFactory repositoryFactory;
     private final ManagedDataSource dataSource;
+    private Jdbi jdbi;
+    private MeasurementRepository measurementRepository;
 
     public TestDatabaseSetup() {
         this(null);
     }
 
-    public TestDatabaseSetup(MeasurementServerApplicationConfiguration config) {
+    private TestDatabaseSetup(MeasurementServerApplicationConfiguration config) {
         if (config == null) {
             config = loadConfiguration();
         }
@@ -45,26 +51,27 @@ public class TestDatabaseSetup implements TestRule {
         new DbMigrationBundle().run(config, environment);
 
         DataSourceFactory dataSourceFactory = config.getDataSourceFactory();
-        repositoryFactory = new RepositoryFactory(environment, dataSourceFactory);
+        RepositoryFactory repositoryFactory = new RepositoryFactory(environment, dataSourceFactory);
+        jdbi = repositoryFactory.getJdbi();
+        measurementRepository = repositoryFactory.createMeasurementRepository();
         dataSource = dataSourceFactory.build(new MetricRegistry(), "cleanup");
     }
 
-    @Override
-    public Statement apply(Statement base, Description description) {
-        return new Statement() {
-            @Override
-            public void evaluate() throws Throwable {
-                before();
-                try {
-                    base.evaluate();
-                } finally {
-                    after();
-                }
-            }
-        };
+    private MeasurementServerApplicationConfiguration loadConfiguration() {
+        try {
+            return new YamlConfigurationFactory<>(
+                    MeasurementServerApplicationConfiguration.class,
+                    BaseValidator.newValidator(),
+                    Jackson.newObjectMapper(new YAMLFactory()),
+                    ""
+            ).build(new FileConfigurationSourceProvider(), ResourceHelpers.resourceFilePath(TestData.getTestConfigFilename()));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
-    private void before() {
+    @Override
+    public void beforeEach(ExtensionContext extensionContext) {
         emptyDb();
     }
 
@@ -78,23 +85,23 @@ public class TestDatabaseSetup implements TestRule {
         }
     }
 
-    private void after() {
-    }
+    @Override
+    public void postProcessTestInstance(Object testInstance, ExtensionContext extensionContext) throws IllegalAccessException {
+        Field[] fields = testInstance.getClass().getDeclaredFields();
+        Map<Class<?>, Object> injectable = Map.of(
+                Jdbi.class, jdbi,
+                MeasurementRepository.class, measurementRepository
+        );
 
-    public RepositoryFactory getRepositoryFactory() {
-        return repositoryFactory;
-    }
+        for (Field field : fields) {
+            if (!field.isAnnotationPresent(Inject.class)) {
+                continue;
+            }
 
-    private MeasurementServerApplicationConfiguration loadConfiguration() {
-        try {
-            return new YamlConfigurationFactory<>(
-                    MeasurementServerApplicationConfiguration.class,
-                    BaseValidator.newValidator(),
-                    Jackson.newObjectMapper(new YAMLFactory()),
-                    ""
-            ).build(new FileConfigurationSourceProvider(), ResourceHelpers.resourceFilePath(TestData.getTestConfigFilename()));
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+            if (injectable.containsKey(field.getType())) {
+                field.setAccessible(true);
+                field.set(testInstance, injectable.get(field.getType()));
+            }
         }
     }
 }

@@ -12,6 +12,7 @@ import javax.validation.Valid;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.time.Instant;
 import java.util.List;
 
 import static java.util.stream.Collectors.toList;
@@ -56,7 +57,7 @@ public class MeasurementResource {
 
         measurementApplication.addMeasurement(
                 sourceIdString,
-                request.getCreatedAtMillis(),
+                Instant.ofEpochMilli(request.getCreatedAtMillis()),
                 request.getType(),
                 request.getValue(),
                 request.getUnit()

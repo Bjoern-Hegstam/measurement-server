@@ -6,6 +6,7 @@ import com.bhegstam.measurement.domain.MeasurementSource;
 import com.bhegstam.measurement.domain.Measurement;
 import com.bhegstam.measurement.domain.MeasurementRepository;
 
+import java.time.Instant;
 import java.util.List;
 
 public class MeasurementApplication {
@@ -19,8 +20,8 @@ public class MeasurementApplication {
         return measurementRepository.getSources();
     }
 
-    public void addMeasurement(String sourceId, long createdAtMillis, String type, double value, String unit) {
-        measurementRepository.addMeasurement(sourceId, createdAtMillis, type, value, unit);
+    public void addMeasurement(String sourceId, Instant createdAt, String type, double value, String unit) {
+        measurementRepository.addMeasurement(sourceId, createdAt, type, value, unit);
     }
 
     public QueryResult<Measurement> getMeasurements(String sourceId, PaginationSettings paginationSettings) {

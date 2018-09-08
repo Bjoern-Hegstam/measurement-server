@@ -13,6 +13,7 @@ import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 import org.jdbi.v3.sqlobject.transaction.Transaction;
 
 import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.List;
 
 @RegisterRowMapper(MeasurementSourceMapper.class)
@@ -21,8 +22,8 @@ public interface JdbiMeasurementRepository extends MeasurementRepository {
     @SqlQuery("select distinct source from measurement order by source")
     List<MeasurementSource> getSources();
 
-    default void addMeasurement(String sourceId, long createdAtMillis, String type, double value, String unit) {
-        insertMeasurement(sourceId, new Timestamp(createdAtMillis), type, value, unit);
+    default void addMeasurement(String sourceId, Instant createdAt, String type, double value, String unit) {
+        insertMeasurement(sourceId, new Timestamp(createdAt.toEpochMilli()), type, value, unit);
     }
 
     @SqlUpdate("insert into measurement(source, timestamp, type, value, unit) values (:source, :timestamp, :type, :value, :unit)")
