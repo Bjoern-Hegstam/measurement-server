@@ -1,12 +1,16 @@
+const webpack = require('webpack');
 const path = require('path');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+
+const devMode = process.env.NODE_ENV !== 'production';
 
 module.exports = {
     entry: './js/index.jsx',
     output: {
         path: path.resolve(__dirname, 'dist'),
-        filename: '[name].bundle.js'
+        filename: '[name].bundle.js',
     },
     module: {
         rules: [
@@ -15,38 +19,34 @@ module.exports = {
                 exclude: /node_modules/,
                 use: {
                     loader: 'babel-loader',
-                    options: {
-                        presets: ['env', 'react'],
-                        plugins: [
-                            'transform-class-properties',
-                            'transform-object-rest-spread'
-                        ]
-                    }
-                }
+                },
             },
             {
-                test: /\.less$/,
+                test: /\.scss$/,
                 exclude: /node_modules/,
-                use: [{
-                    loader: "style-loader" // creates style nodes from JS strings
-                }, {
-                    loader: "css-loader" // translates CSS into CommonJS
-                }, {
-                    loader: "less-loader" // compiles Less to CSS
-                }]
-            }
-        ]
+                use: [
+                    devMode ? 'style-loader' : MiniCssExtractPlugin.loader,
+                    'css-loader',
+                    'sass-loader',
+
+                ],
+            },
+        ],
     },
     resolve: {
         extensions: ['.js', '.jsx', '.less'],
     },
     plugins: [
         new CleanWebpackPlugin(['dist']),
+        new webpack.DefinePlugin({
+            BASE_URL: JSON.stringify(devMode ? 'http://localhost:4567' : ''),
+        }),
         new HtmlWebpackPlugin({
+            template: path.resolve(__dirname, 'index.ejs'),
             title: 'Plant monitor',
-            inject: false,
-            template: require('html-webpack-template'),
-            appMountId: 'root'
-        })
-    ]
+        }),
+        new MiniCssExtractPlugin({
+            filename: '[name].[contenthash].css',
+        }),
+    ],
 };

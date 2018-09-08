@@ -1,0 +1,26 @@
+dataSourceFactory:
+  driverClass: org.postgresql.Driver
+  url: ${JDBC_DATABASE_URL}
+  user: ${JDBC_DATABASE_USERNAME}
+  password: ${JDBC_DATABASE_PASSWORD}
+  validationQuery: "SELECT 1"
+  validationQueryTimeout: 3s
+  minSize: 8
+  maxSize: 32
+
+server:
+  type: simple
+  applicationContextPath: /
+  rootPath: /api/*
+  adminContextPath: /admin
+  connector:
+    type: http
+    port: ${PORT}
+
+logging:
+  level: INFO
+  loggers:
+    com.bhegstam.shoppinglist.port.rest.login.LoginResource: DEBUG
+  appenders:
+    - type: console
+      logFormat: "%-6level [%d{HH:mm:ss.SSS}] [%t] %logger{5} - %X{code} %msg %n"
