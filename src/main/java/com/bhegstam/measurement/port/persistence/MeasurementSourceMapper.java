@@ -11,7 +11,7 @@ public class MeasurementSourceMapper implements RowMapper<MeasurementSource> {
     @Override
     public MeasurementSource map(ResultSet rs, StatementContext ctx) throws SQLException {
         return new MeasurementSource(
-                rs.getString("name")
+                rs.getString("source")
         );
     }
 }

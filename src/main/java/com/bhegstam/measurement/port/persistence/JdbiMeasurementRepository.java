@@ -30,7 +30,7 @@ public interface JdbiMeasurementRepository extends MeasurementRepository {
 
     @Transaction
     default QueryResult<Measurement> getMeasurements(String sourceId, PaginationSettings paginationSettings){
-        int totalCount = getTotalMeasurementCount();
+        int totalCount = getTotalMeasurementCount(sourceId);
         PaginationInformation paginationInformation = PaginationInformation.calculate(totalCount, paginationSettings);
 
         List<Measurement> measurements = selectMeasurements(sourceId, paginationInformation.getPerPage(), paginationInformation.getOffset());
@@ -38,8 +38,8 @@ public interface JdbiMeasurementRepository extends MeasurementRepository {
         return new QueryResult<>(measurements, paginationInformation);
     }
 
-    @SqlQuery("select count(id) from measurement")
-    int getTotalMeasurementCount();
+    @SqlQuery("select count(id) from measurement where source = :source")
+    int getTotalMeasurementCount(@Bind("source") String source);
 
     @SqlQuery("select * from measurement where source = :source order by timestamp limit :perPage offset :offset")
     List<Measurement> selectMeasurements(@Bind("source") String source, @Bind("perPage") int perPage, @Bind("offset") int offset);
