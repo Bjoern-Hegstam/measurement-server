@@ -3,7 +3,7 @@ Description=Measurement server
 After=network.target
 
 [Service]
-ExecStart=java -jar measurement-server-${project.version}.jar server config.yml
+ExecStart=/usr/bin/java -jar measurement-server.jar server config.yml
 WorkingDirectory=/opt/measurement-server
 StandardOutput=inherit
 StandardError=inherit

@@ -91,7 +91,7 @@ public class JdbiMeasurementRepositoryTest {
                 () -> {
                     PaginationInformation paginationInformation = queryResult
                             .getPaginationInformation()
-                            .orElseThrow();
+                            .get();
                     assertAll(
                             () -> assertThat("Total item count", paginationInformation.getTotalItemCount(), is(0)),
                             () -> assertThat("Page count", paginationInformation.getPageCount(), is(1)),
@@ -130,7 +130,7 @@ public class JdbiMeasurementRepositoryTest {
                 () -> {
                     PaginationInformation paginationInformation = queryResult
                             .getPaginationInformation()
-                            .orElseThrow();
+                            .get();
                     assertAll(
                             () -> assertThat("Total item count", paginationInformation.getTotalItemCount(), is(1)),
                             () -> assertThat("Page count", paginationInformation.getPageCount(), is(1)),
@@ -158,7 +158,7 @@ public class JdbiMeasurementRepositoryTest {
                 () -> {
                     PaginationInformation paginationInformation = queryResult
                             .getPaginationInformation()
-                            .orElseThrow();
+                            .get();
                     assertAll(
                             () -> assertThat("Total item count", paginationInformation.getTotalItemCount(), is(40)),
                             () -> assertThat("Page count", paginationInformation.getPageCount(), is(2)),
@@ -186,7 +186,7 @@ public class JdbiMeasurementRepositoryTest {
                 () -> {
                     PaginationInformation paginationInformation = queryResult
                             .getPaginationInformation()
-                            .orElseThrow();
+                            .get();
                     assertAll(
                             () -> assertThat("Total item count", paginationInformation.getTotalItemCount(), is(40)),
                             () -> assertThat("Page count", paginationInformation.getPageCount(), is(2)),

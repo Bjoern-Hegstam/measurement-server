@@ -1,15 +1,14 @@
 #!/bin/sh
 
-firstInstall=[ ! -f /etc/systemd/system/measurement-server.service ]
+cp measurement-server-${project.version}.jar /opt/measurement-server/measurement-server.jar
+cp measurement-server.service /etc/systemd/system/
 
-sudo cp measurement-server.service /etc/systemd/system/measurement-server.service
+systemctl daemon-reload
 
-sudo systemctl deamon-reload
-
-if [ ${firstInstall} ]
+if [ ! -f /etc/systemd/system/measurement-server.service ]
 then
-    sudo systemctl enable measurement-server.service
-    sudo systemctl start measurement-server.service
+    systemctl enable measurement-server.service
+    systemctl start measurement-server.service
 else
-    sudo systemctl restart measurement-server.service
+    systemctl restart measurement-server.service
 fi

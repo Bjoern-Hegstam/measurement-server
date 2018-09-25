@@ -10,11 +10,14 @@
             <source>${basedir}/target/measurement-server-${project.version}.jar</source>
         </file>
         <file>
+            <source>config.yml</source>
+        </file>
+        <file>
             <source>install.sh</source>
+            <filtered>true</filtered>
         </file>
         <file>
             <source>measurement-server.service</source>
-            <filtered>true</filtered>
         </file>
     </files>
 </assembly>
