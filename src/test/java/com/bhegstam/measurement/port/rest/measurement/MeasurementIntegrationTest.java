@@ -7,6 +7,8 @@ import com.bhegstam.measurement.port.rest.JsonMapper;
 import com.bhegstam.measurement.util.DropwizardAppRuleFactory;
 import com.bhegstam.measurement.util.TestDatabaseSetup;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.dropwizard.testing.junit.DropwizardAppRule;
 import org.junit.Rule;
 import org.junit.jupiter.api.BeforeEach;
@@ -23,6 +25,7 @@ import static javax.ws.rs.core.Response.Status.OK;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 
 @ExtendWith(ExternalResourceSupport.class)
 @ExtendWith(TestDatabaseSetup.class)
@@ -108,11 +111,20 @@ public class MeasurementIntegrationTest {
 
         JsonNode responseJson = jsonMapper.read(response);
         assertThat(responseJson.size(), is(40));
+
+        JsonNode firstMeasurement = responseJson.get(0);
+        JsonNode lastMeasurement = responseJson.get(responseJson.size() - 1);
+
+        long firstCreatedAt = firstMeasurement.get("createdAtMillis").asLong();
+        long lastCreatedAt = lastMeasurement.get("createdAtMillis").asLong();
+
+        assertTrue("Measurements by createdAt desc", firstCreatedAt > lastCreatedAt);
     }
 
     private void insertMeasurements(String sourceId, int count) {
+        Instant baseCreatedAt = Instant.now();
         for (int i = 0; i < count; i++) {
-            measurementRepository.addMeasurement(sourceId, Instant.now(), TYPE, i, UNIT);
+            measurementRepository.addMeasurement(sourceId, baseCreatedAt.plusSeconds(i), TYPE, i, UNIT);
         }
     }
 

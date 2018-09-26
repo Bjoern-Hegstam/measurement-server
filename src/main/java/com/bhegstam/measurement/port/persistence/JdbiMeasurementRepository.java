@@ -42,6 +42,6 @@ public interface JdbiMeasurementRepository extends MeasurementRepository {
     @SqlQuery("select count(id) from measurement where source = :source")
     int getTotalMeasurementCount(@Bind("source") String source);
 
-    @SqlQuery("select * from measurement where source = :source order by timestamp limit :perPage offset :offset")
+    @SqlQuery("select * from measurement where source = :source order by timestamp desc limit :perPage offset :offset")
     List<Measurement> selectMeasurements(@Bind("source") String source, @Bind("perPage") int perPage, @Bind("offset") int offset);
 }
