@@ -7,7 +7,7 @@ import com.bhegstam.measurement.port.rest.JsonMapper;
 import com.bhegstam.measurement.util.DropwizardAppRuleFactory;
 import com.bhegstam.measurement.util.TestDatabaseSetup;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.dropwizard.testing.junit.DropwizardAppRule;
 import org.junit.Rule;
@@ -21,15 +21,15 @@ import javax.ws.rs.core.Response;
 import java.time.Instant;
 
 import static com.bhegstam.measurement.port.rest.ResponseTestUtil.assertResponseStatus;
+import static javax.ws.rs.core.Response.Status.CREATED;
 import static javax.ws.rs.core.Response.Status.OK;
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 @ExtendWith(ExternalResourceSupport.class)
 @ExtendWith(TestDatabaseSetup.class)
 public class MeasurementIntegrationTest {
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
     private static final String TYPE = "TYPE";
     private static final String UNIT = "UNIT";
     private static final String SOURCE_1_ID = "s1";
@@ -119,6 +119,23 @@ public class MeasurementIntegrationTest {
         long lastCreatedAt = lastMeasurement.get("createdAtMillis").asLong();
 
         assertTrue("Measurements by createdAt desc", firstCreatedAt > lastCreatedAt);
+    }
+
+    @Test
+    void postMeasurement() {
+        // given
+        ObjectNode requestBody = OBJECT_MAPPER.createObjectNode();
+        requestBody.put("source", SOURCE_1_ID);
+        requestBody.put("createdAtMillis", Instant.now().toEpochMilli());
+        requestBody.put("type", TYPE);
+        requestBody.put("value", 17);
+        requestBody.put("unit", UNIT);
+
+        // when
+        Response response = api.postMeasurement(requestBody);
+
+        // then
+        assertResponseStatus(response, CREATED);
     }
 
     private void insertMeasurements(String sourceId, int count) {

@@ -18,8 +18,9 @@ import java.util.List;
 import static java.util.stream.Collectors.toList;
 import static javax.ws.rs.core.Response.Status.CREATED;
 import static javax.ws.rs.core.Response.Status.OK;
+import static javax.ws.rs.core.Response.Status.REQUEST_ENTITY_TOO_LARGE;
 
-@Path("sources")
+@Path("")
 @Produces(MediaType.APPLICATION_JSON)
 public class MeasurementResource {
     private static final Logger LOGGER = LoggerFactory.getLogger(MeasurementResource.class);
@@ -30,6 +31,7 @@ public class MeasurementResource {
         this.measurementApplication = measurementApplication;
     }
 
+    @Path("sources")
     @GET
     public Response getSources() {
         LOGGER.info("Received request to get all sources");
@@ -50,13 +52,13 @@ public class MeasurementResource {
                 .build();
     }
 
-    @Path("{sourceId}/measurements")
+    @Path("measurements")
     @POST
-    public Response postMeasurement(@PathParam("sourceId") String sourceIdString, @Valid CreateMeasurementRequest request) {
-        LOGGER.info("Received request [{}] to post measurement for source [{}]", request, sourceIdString);
+    public Response postMeasurement(@Valid CreateMeasurementRequest request) {
+        LOGGER.info("Received request [{}] to post measurement", request);
 
         measurementApplication.addMeasurement(
-                sourceIdString,
+                request.getSource(),
                 Instant.ofEpochMilli(request.getCreatedAtMillis()),
                 request.getType(),
                 request.getValue(),
@@ -73,7 +75,7 @@ public class MeasurementResource {
                 .build();
     }
 
-    @Path("{sourceId}/measurements")
+    @Path("sources/{sourceId}/measurements")
     @GET
     public Response getMeasurementsForSource(@PathParam("sourceId") String sourceIdString, @QueryParam("per_page") Integer perPage, @QueryParam("page") Integer page) {
         PaginationSettings paginationSettings = new PaginationSettings(

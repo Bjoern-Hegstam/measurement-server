@@ -9,23 +9,28 @@ import org.hibernate.validator.constraints.NotEmpty;
 
 @Getter
 public class CreateMeasurementRequest {
-    private long createdAtMillis;
+    @NotEmpty
+    private final String source;
+
+    private final long createdAtMillis;
 
     @NotEmpty
-    private String type;
+    private final String type;
 
-    private double value;
+    private final double value;
 
     @NotEmpty
-    private String unit;
+    private final String unit;
 
     @JsonCreator
     public CreateMeasurementRequest(
-            @JsonProperty(value = "createdAtMillis", required = true) long createdAtMillis,
-            @JsonProperty(value = "type", required = true) String type,
-            @JsonProperty(value = "value", required = true) double value,
-            @JsonProperty(value = "unit", required = true) String unit
+            @JsonProperty(value = "source") String source,
+            @JsonProperty(value = "createdAtMillis") long createdAtMillis,
+            @JsonProperty(value = "type") String type,
+            @JsonProperty(value = "value") double value,
+            @JsonProperty(value = "unit") String unit
     ) {
+        this.source = source;
         this.createdAtMillis = createdAtMillis;
         this.type = type;
         this.value = value;

@@ -1,14 +1,16 @@
 package com.bhegstam.measurement.port.rest.measurement;
 
+import com.fasterxml.jackson.databind.JsonNode;
+
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Response;
 
-public class MeasurementApi {
+class MeasurementApi {
     private final WebTarget webTarget;
 
-    public MeasurementApi(String serviceUrl) {
+    MeasurementApi(String serviceUrl) {
         webTarget = ClientBuilder
                 .newClient()
                 .target(serviceUrl);
@@ -21,10 +23,8 @@ public class MeasurementApi {
                 .get();
     }
 
-    Response postMeasurement(String sourceId, String json) {
+    Response postMeasurement(JsonNode json) {
         return webTarget
-                .path("sources")
-                .path(sourceId)
                 .path("measurements")
                 .request()
                 .post(Entity.json(json));
