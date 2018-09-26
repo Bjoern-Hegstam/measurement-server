@@ -12,8 +12,6 @@ public class CreateMeasurementRequest {
     @NotEmpty
     private final String source;
 
-    private final long createdAtMillis;
-
     @NotEmpty
     private final String type;
 
@@ -25,13 +23,11 @@ public class CreateMeasurementRequest {
     @JsonCreator
     public CreateMeasurementRequest(
             @JsonProperty(value = "source") String source,
-            @JsonProperty(value = "createdAtMillis") long createdAtMillis,
             @JsonProperty(value = "type") String type,
             @JsonProperty(value = "value") double value,
             @JsonProperty(value = "unit") String unit
     ) {
         this.source = source;
-        this.createdAtMillis = createdAtMillis;
         this.type = type;
         this.value = value;
         this.unit = unit;

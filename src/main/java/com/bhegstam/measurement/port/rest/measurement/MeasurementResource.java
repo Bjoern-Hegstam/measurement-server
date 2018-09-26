@@ -59,7 +59,7 @@ public class MeasurementResource {
 
         measurementApplication.addMeasurement(
                 request.getSource(),
-                Instant.ofEpochMilli(request.getCreatedAtMillis()),
+                Instant.now(),
                 request.getType(),
                 request.getValue(),
                 request.getUnit()

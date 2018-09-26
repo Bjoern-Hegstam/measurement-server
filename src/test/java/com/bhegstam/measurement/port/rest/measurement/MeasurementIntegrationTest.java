@@ -126,7 +126,6 @@ public class MeasurementIntegrationTest {
         // given
         ObjectNode requestBody = OBJECT_MAPPER.createObjectNode();
         requestBody.put("source", SOURCE_1_ID);
-        requestBody.put("createdAtMillis", Instant.now().toEpochMilli());
         requestBody.put("type", TYPE);
         requestBody.put("value", 17);
         requestBody.put("unit", UNIT);
