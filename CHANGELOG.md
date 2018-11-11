@@ -1,5 +1,9 @@
 ### Unreleased
+
+### 3.3
 * Upgrade dependencies
+* Can run server as systemctl service
+* Migrated to dropwizard
 
 ### 3.2
 * gzip all responses
