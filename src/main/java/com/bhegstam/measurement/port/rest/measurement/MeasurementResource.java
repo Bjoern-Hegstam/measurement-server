@@ -3,8 +3,7 @@ package com.bhegstam.measurement.port.rest.measurement;
 import com.bhegstam.measurement.application.MeasurementApplication;
 import com.bhegstam.measurement.db.PaginationSettings;
 import com.bhegstam.measurement.db.QueryResult;
-import com.bhegstam.measurement.domain.MeasurementSource;
-import com.bhegstam.measurement.domain.Measurement;
+import com.bhegstam.measurement.domain.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,7 +17,6 @@ import java.util.List;
 import static java.util.stream.Collectors.toList;
 import static javax.ws.rs.core.Response.Status.CREATED;
 import static javax.ws.rs.core.Response.Status.OK;
-import static javax.ws.rs.core.Response.Status.REQUEST_ENTITY_TOO_LARGE;
 
 @Path("")
 @Produces(MediaType.APPLICATION_JSON)
@@ -31,28 +29,14 @@ public class MeasurementResource {
         this.measurementApplication = measurementApplication;
     }
 
-    @Path("sources")
-    @GET
-    public Response getSources() {
-        LOGGER.info("Received request to get all sources");
-
-        List<MeasurementSource> sources = measurementApplication.getSources();
-
-        Response.Status status = OK;
-        List<SourceDto> body = sources
-                .stream()
-                .map(SourceDto::new)
-                .collect(toList());
-
-        logResponse(status, body);
-
-        return Response
-                .status(status)
-                .entity(body)
-                .build();
+    @Deprecated
+    @Path("measurements")
+    @POST
+    public Response postMeasurement_deprecated(@Valid CreateMeasurementRequest request) {
+        return postMeasurement(request);
     }
 
-    @Path("measurements")
+    @Path("measurement")
     @POST
     public Response postMeasurement(@Valid CreateMeasurementRequest request) {
         LOGGER.info("Received request [{}] to post measurement", request);
@@ -75,15 +59,44 @@ public class MeasurementResource {
                 .build();
     }
 
-    @Path("sources/{sourceId}/measurements")
+    @Path("instrumentation")
     @GET
-    public Response getMeasurementsForSource(@PathParam("sourceId") String sourceIdString, @QueryParam("per_page") Integer perPage, @QueryParam("page") Integer page) {
+    public Response getInstrumentations() {
+        LOGGER.info("Received request to get all instrumentations");
+
+        List<Instrumentation> instrumentations = measurementApplication.getInstrumentations();
+
+        Response.Status status = OK;
+        List<InstrumentationDto> body = instrumentations
+                .stream()
+                .map(InstrumentationDto::new)
+                .collect(toList());
+
+        logResponse(status, body);
+
+        return Response
+                .status(status)
+                .entity(body)
+                .build();
+    }
+
+    @Path("instrumentation/{instrumentationId}/sensor/{sensorId}/measurement")
+    @GET
+    public Response getMeasurementsForSensor(
+            @PathParam("instrumentationId") String instrumentationIdString,
+            @PathParam("sensorId") String sensorIdString,
+            @QueryParam("per_page") Integer perPage,
+            @QueryParam("page") Integer page
+    ) {
         PaginationSettings paginationSettings = new PaginationSettings(
                 perPage != null ? perPage : PaginationSettings.DEFAULT_ITEMS_PER_PAGE,
                 page != null ? page : PaginationSettings.DEFAULT_PAGE
         );
 
-        QueryResult<Measurement> queryResult = measurementApplication.getMeasurements(sourceIdString, paginationSettings);
+        QueryResult<Measurement> queryResult = measurementApplication.getMeasurements(
+                InstrumentationId.parse(instrumentationIdString),
+                SensorId.parse(sensorIdString),
+                paginationSettings);
 
         Response.Status status = OK;
         List<GetMeasurementResponse> body = queryResult

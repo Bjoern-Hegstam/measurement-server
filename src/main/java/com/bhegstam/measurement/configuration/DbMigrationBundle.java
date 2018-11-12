@@ -9,10 +9,11 @@ import org.flywaydb.core.Flyway;
 public class DbMigrationBundle implements ConfiguredBundle<MeasurementServerApplicationConfiguration> {
     @Override
     public void run(MeasurementServerApplicationConfiguration config, Environment environment) {
-        Flyway flyway = new Flyway();
         DataSourceFactory dataSourceFactory = config.getDataSourceFactory();
-        flyway.setDataSource(dataSourceFactory.getUrl(), dataSourceFactory.getUser(), dataSourceFactory.getPassword());
-        flyway.migrate();
+        Flyway.configure()
+              .dataSource(dataSourceFactory.getUrl(), dataSourceFactory.getUser(), dataSourceFactory.getPassword())
+              .load()
+              .migrate();
     }
 
     @Override

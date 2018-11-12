@@ -2,9 +2,7 @@ package com.bhegstam.measurement.application;
 
 import com.bhegstam.measurement.db.PaginationSettings;
 import com.bhegstam.measurement.db.QueryResult;
-import com.bhegstam.measurement.domain.MeasurementSource;
-import com.bhegstam.measurement.domain.Measurement;
-import com.bhegstam.measurement.domain.MeasurementRepository;
+import com.bhegstam.measurement.domain.*;
 
 import java.time.Instant;
 import java.util.List;
@@ -16,15 +14,15 @@ public class MeasurementApplication {
         this.measurementRepository = measurementRepository;
     }
 
-    public List<MeasurementSource> getSources() {
-        return measurementRepository.getSources();
+    public List<Instrumentation> getInstrumentations() {
+        return measurementRepository.getInstrumentations();
     }
 
-    public void addMeasurement(String sourceId, Instant createdAt, String type, double value, String unit) {
-        measurementRepository.addMeasurement(sourceId, createdAt, type, value, unit);
+    public void addMeasurement(String source, Instant createdAt, String type, double value, String unit) {
+        measurementRepository.addMeasurement(source, createdAt, type, value, unit);
     }
 
-    public QueryResult<Measurement> getMeasurements(String sourceId, PaginationSettings paginationSettings) {
-        return measurementRepository.getMeasurements(sourceId, paginationSettings);
+    public QueryResult<Measurement> getMeasurements(InstrumentationId instrumentationId, SensorId sensorId, PaginationSettings paginationSettings) {
+        return measurementRepository.getMeasurements(instrumentationId, sensorId, paginationSettings);
     }
 }

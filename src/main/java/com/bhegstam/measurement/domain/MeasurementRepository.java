@@ -4,12 +4,21 @@ import com.bhegstam.measurement.db.PaginationSettings;
 import com.bhegstam.measurement.db.QueryResult;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface MeasurementRepository {
-    List<MeasurementSource> getSources();
+    void addInstrumentation(InstrumentationId instrumentationId, String name);
 
-    void addMeasurement(String sourceId, Instant createdAt, String type, double value, String unit);
+    List<Instrumentation> getInstrumentations();
 
-    QueryResult<Measurement> getMeasurements(String sourceId, PaginationSettings paginationSettings);
+    void addSensor(Sensor sensor);
+
+    void registerSensor(InstrumentationId instrumentationId, SensorId sensorId, LocalDateTime validFromUtc);
+
+    void unregisterSensor(InstrumentationId instrumentationId, SensorId sensorId, LocalDateTime validToUtc);
+
+    boolean addMeasurement(String source, Instant createdAt, String type, double value, String unit);
+
+    QueryResult<Measurement> getMeasurements(InstrumentationId instrumentationId, SensorId sensorId, PaginationSettings paginationSettings);
 }

@@ -1,5 +1,7 @@
 package com.bhegstam.measurement.port.rest.measurement;
 
+import com.bhegstam.measurement.domain.InstrumentationId;
+import com.bhegstam.measurement.domain.SensorId;
 import com.fasterxml.jackson.databind.JsonNode;
 
 import javax.ws.rs.client.ClientBuilder;
@@ -16,25 +18,27 @@ class MeasurementApi {
                 .target(serviceUrl);
     }
 
-    Response getSources() {
+    Response getInstrumentations() {
         return webTarget
-                .path("sources")
+                .path("instrumentation")
                 .request()
                 .get();
     }
 
     Response postMeasurement(JsonNode json) {
         return webTarget
-                .path("measurements")
+                .path("measurement")
                 .request()
                 .post(Entity.json(json));
     }
 
-    Response getMeasurements(String sourceId, int perPage, int page) {
+    Response getMeasurements(InstrumentationId instrumentationId, SensorId sensorId, int perPage, int page) {
         return webTarget
-                .path("sources")
-                .path(sourceId)
-                .path("measurements")
+                .path("instrumentation")
+                .path(instrumentationId.getId())
+                .path("sensor")
+                .path(sensorId.getId())
+                .path("measurement")
                 .queryParam("per_page", perPage)
                 .queryParam("page", page)
                 .request()

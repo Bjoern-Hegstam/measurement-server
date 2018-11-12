@@ -1,4 +1,10 @@
 ### Unreleased
+* Refactor domain model
+  * Remove source as terminology and only use sensor to denote something that produces measurements.
+  * Introduce instrumentations
+    * Groups collections of sensors
+    * Gives control over whether measurements from a sensor should be recorded or not.
+    * Allows sensors to be reused over time
 
 ### 3.3
 * Upgrade dependencies

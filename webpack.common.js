@@ -43,7 +43,7 @@ module.exports = {
         }),
         new HtmlWebpackPlugin({
             template: path.resolve(__dirname, 'index.ejs'),
-            title: 'Plant monitor',
+            title: 'measurement-server',
         }),
         new MiniCssExtractPlugin({
             filename: '[name].[contenthash].css',

@@ -1,28 +1,25 @@
-import types from "./types";
+import * as types from "./types";
 
-export function getMeasurementSources() {
+export function getInstrumentations() {
     return {
-        type: types.GET_MEASUREMENT_SOURCES,
+        type: types.GET_INSTRUMENTATIONS,
         payload: {
             request: {
                 method: 'get',
-                url: '/sources',
-                responseType: 'json'
+                url: '/instrumentation',
+                responseType: 'json',
             }
         }
     }
 }
 
-export function getMeasurements(sourceName, perPage=100, page=1) {
+export function getMeasurements({ instrumentationId, sensorId, perPage = 80, page = 1 }) {
     return {
         type: types.GET_MEASUREMENTS,
-        queryInfo: {
-            sourceName
-        },
         payload: {
             request: {
                 method: 'get',
-                url: `/sources/${sourceName}/measurements?per_page=${perPage}&page=${page}`,
+                url: `/instrumentation/${instrumentationId}/sensor/${sensorId}/measurement?per_page=${perPage}&page=${page}`,
                 responseType: 'json'
             }
         }

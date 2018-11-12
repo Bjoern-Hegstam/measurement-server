@@ -7,22 +7,26 @@ import org.apache.commons.lang.builder.ToStringStyle;
 
 public class GetMeasurementResponse {
     @JsonProperty
-    private SourceDto source;
+    private final String instrumentationId;
 
     @JsonProperty
-    private long createdAtMillis;
+    private final String sensorId;
 
     @JsonProperty
-    private String type;
+    private final long createdAtMillis;
 
     @JsonProperty
-    private double value;
+    private final String type;
 
     @JsonProperty
-    private String unit;
+    private final double value;
 
-    public GetMeasurementResponse(Measurement measurement) {
-        this.source = new SourceDto(measurement.getSource());
+    @JsonProperty
+    private final String unit;
+
+    GetMeasurementResponse(Measurement measurement) {
+        this.instrumentationId = measurement.getInstrumentationId().getId();
+        this.sensorId = measurement.getSensorId().getId();
         this.createdAtMillis = measurement.getCreatedAt().toEpochMilli();
         this.type = measurement.getType();
         this.value = measurement.getValue();

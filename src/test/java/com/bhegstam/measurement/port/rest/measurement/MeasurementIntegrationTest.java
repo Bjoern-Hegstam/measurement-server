@@ -2,7 +2,7 @@ package com.bhegstam.measurement.port.rest.measurement;
 
 import com.bhegstam.measurement.configuration.MeasurementServerApplicationConfiguration;
 import com.bhegstam.measurement.db.PaginationInformation;
-import com.bhegstam.measurement.domain.MeasurementRepository;
+import com.bhegstam.measurement.domain.*;
 import com.bhegstam.measurement.port.rest.JsonMapper;
 import com.bhegstam.measurement.util.DropwizardAppRuleFactory;
 import com.bhegstam.measurement.util.TestDatabaseSetup;
@@ -19,11 +19,14 @@ import org.junit.jupiter.migrationsupport.rules.ExternalResourceSupport;
 import javax.inject.Inject;
 import javax.ws.rs.core.Response;
 import java.time.Instant;
+import java.time.LocalDateTime;
 
 import static com.bhegstam.measurement.port.rest.ResponseTestUtil.assertResponseStatus;
+import static java.time.ZoneOffset.UTC;
 import static javax.ws.rs.core.Response.Status.CREATED;
 import static javax.ws.rs.core.Response.Status.OK;
 import static org.hamcrest.core.Is.is;
+import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.Assert.*;
 
 @ExtendWith(ExternalResourceSupport.class)
@@ -32,8 +35,11 @@ public class MeasurementIntegrationTest {
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
     private static final String TYPE = "TYPE";
     private static final String UNIT = "UNIT";
-    private static final String SOURCE_1_ID = "s1";
-    private static final String SOURCE_2_ID = "s2";
+    private static final InstrumentationId INSTRUMENTATION_ID_1 = InstrumentationId.parse("instrumentation-id-1");
+    private static final InstrumentationId INSTRUMENTATION_ID_2 = InstrumentationId.parse("instrumentation-id-2");
+    private static final Sensor SENSOR_1 = new Sensor(new SensorId(), "sensor-1");
+    private static final Sensor SENSOR_2 = new Sensor(new SensorId(), "sensor-2");
+    private static final Sensor SENSOR_3 = new Sensor(new SensorId(), "sensor-3");
 
     @Rule
     public static final DropwizardAppRule<MeasurementServerApplicationConfiguration> service = DropwizardAppRuleFactory.forIntegrationTest();
@@ -47,12 +53,16 @@ public class MeasurementIntegrationTest {
     void setUp() {
         String serviceUrl = "http://localhost:" + service.getLocalPort() + "/api/";
         api = new MeasurementApi(serviceUrl);
+
+        measurementRepository.addSensor(SENSOR_1);
+        measurementRepository.addSensor(SENSOR_2);
+        measurementRepository.addSensor(SENSOR_3);
     }
 
     @Test
-    void getSources_emptyDb() {
+    void getInstrumentations_emptyDb() {
         // when
-        Response response = api.getSources();
+        Response response = api.getInstrumentations();
 
         // then
         assertResponseStatus(response, OK);
@@ -62,28 +72,43 @@ public class MeasurementIntegrationTest {
     }
 
     @Test
-    void getSources() {
+    void getInstrumentations() {
         // given
-        measurementRepository.addMeasurement(SOURCE_1_ID, Instant.now(), TYPE, 1.0, UNIT);
-        measurementRepository.addMeasurement(SOURCE_2_ID, Instant.now(), TYPE, 1.0, UNIT);
+        measurementRepository.addInstrumentation(INSTRUMENTATION_ID_1, "instrumentation-1");
+        LocalDateTime baseSensorValidFrom = LocalDateTime.of(2010, 3, 14, 12, 0);
+        measurementRepository.registerSensor(INSTRUMENTATION_ID_1, SENSOR_1.getId(), baseSensorValidFrom);
+        measurementRepository.unregisterSensor(INSTRUMENTATION_ID_1, SENSOR_1.getId(), baseSensorValidFrom.plusDays(1));
+        measurementRepository.registerSensor(INSTRUMENTATION_ID_1, SENSOR_2.getId(), baseSensorValidFrom);
+
+        measurementRepository.addInstrumentation(INSTRUMENTATION_ID_2, "instrumentation-2");
+        measurementRepository.registerSensor(INSTRUMENTATION_ID_2, SENSOR_3.getId(), baseSensorValidFrom);
 
         // when
-        Response response = api.getSources();
+        Response response = api.getInstrumentations();
 
         // then
         assertResponseStatus(response, OK);
 
         JsonNode responseJson = jsonMapper.read(response);
-        assertThat(responseJson.size(), is(2));
+        JsonNode instrumentationJson1 = responseJson.get(0);
+        assertThat(instrumentationJson1.get("name").asText(), is("instrumentation-1"));
+        JsonNode registrationsJson1 = instrumentationJson1.get("sensorRegistrations");
+        assertThat(registrationsJson1.size(), is(2));
+        assertThat(registrationsJson1.get(0).get("sensor").get("id").asText(), is(SENSOR_2.getId().getId()));
+        assertThat(registrationsJson1.get(0).get("validFromUtc").asText(), is(baseSensorValidFrom.toString()));
+        assertThat(registrationsJson1.get(0).get("validToUtc"), is(nullValue()));
+        assertThat(registrationsJson1.get(1).get("sensor").get("id").asText(), is(SENSOR_1.getId().getId()));
+        assertThat(registrationsJson1.get(1).get("validFromUtc").asText(), is(baseSensorValidFrom.toString()));
+        assertThat(registrationsJson1.get(1).get("validToUtc").asText(), is(baseSensorValidFrom.plusDays(1).toString()));
 
-        assertThat(responseJson.get(0).get("name").asText(), is(SOURCE_1_ID));
-        assertThat(responseJson.get(1).get("name").asText(), is(SOURCE_2_ID));
+        JsonNode instrumentationJson2 = responseJson.get(1);
+        assertThat(instrumentationJson2.get("name").asText(), is("instrumentation-2"));
     }
 
     @Test
     void getMeasurements_emptyDb() {
         // when
-        Response response = api.getMeasurements("id", 40, 1);
+        Response response = api.getMeasurements(INSTRUMENTATION_ID_1, SensorId.parse("id"), 40, 1);
 
         // then
         assertResponseStatus(response, OK);
@@ -98,11 +123,15 @@ public class MeasurementIntegrationTest {
     @Test
     void getMeasurements() {
         // given
-        insertMeasurements(SOURCE_1_ID, 100);
-        insertMeasurements(SOURCE_2_ID, 100);
+        measurementRepository.addInstrumentation(INSTRUMENTATION_ID_1, "instrumentation-1");
+        measurementRepository.registerSensor(INSTRUMENTATION_ID_1, SENSOR_1.getId(), LocalDateTime.now(UTC));
+        measurementRepository.registerSensor(INSTRUMENTATION_ID_1, SENSOR_2.getId(), LocalDateTime.now(UTC));
+
+        insertMeasurements(SENSOR_1.getName(), 100);
+        insertMeasurements(SENSOR_2.getName(), 100);
 
         // when
-        Response response = api.getMeasurements(SOURCE_1_ID, 40, 1);
+        Response response = api.getMeasurements(INSTRUMENTATION_ID_1, SENSOR_1.getId(), 40, 1);
 
         // then
         assertResponseStatus(response, OK);
@@ -124,11 +153,12 @@ public class MeasurementIntegrationTest {
     @Test
     void postMeasurement() {
         // given
-        ObjectNode requestBody = OBJECT_MAPPER.createObjectNode();
-        requestBody.put("source", SOURCE_1_ID);
-        requestBody.put("type", TYPE);
-        requestBody.put("value", 17);
-        requestBody.put("unit", UNIT);
+        ObjectNode requestBody = OBJECT_MAPPER
+                .createObjectNode()
+                .put("source", SENSOR_1.getId().getId())
+                .put("type", TYPE)
+                .put("value", 17)
+                .put("unit", UNIT);
 
         // when
         Response response = api.postMeasurement(requestBody);
@@ -137,10 +167,10 @@ public class MeasurementIntegrationTest {
         assertResponseStatus(response, CREATED);
     }
 
-    private void insertMeasurements(String sourceId, int count) {
+    private void insertMeasurements(String source, int count) {
         Instant baseCreatedAt = Instant.now();
         for (int i = 0; i < count; i++) {
-            measurementRepository.addMeasurement(sourceId, baseCreatedAt.plusSeconds(i), TYPE, i, UNIT);
+            measurementRepository.addMeasurement(source, baseCreatedAt.plusSeconds(i), TYPE, i, UNIT);
         }
     }
 

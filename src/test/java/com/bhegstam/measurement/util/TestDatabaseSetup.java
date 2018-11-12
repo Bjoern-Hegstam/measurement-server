@@ -30,7 +30,10 @@ import static java.util.Arrays.asList;
 
 public class TestDatabaseSetup implements BeforeEachCallback, TestInstancePostProcessor {
     private static final List<String> CLEANUP_SQL_STATEMENTS = asList(
-            "delete from measurement"
+            "delete from measurement",
+            "delete from sensor_registration",
+            "delete from sensor",
+            "delete from instrumentation"
     );
 
     private final ManagedDataSource dataSource;

@@ -1,8 +1,12 @@
-import {combineReducers} from 'redux';
-import sources from './MeasurementSourcesReducer';
-import measurementsBySource from './MeasurementsReducer';
+import { combineReducers } from 'redux';
+import entities from './EntitiesReducer';
+import loading from './LoadingReducer';
+import error from './ErrorReducer';
 
 export default combineReducers({
-    sources,
-    measurementsBySource
+    entities,
+    request: combineReducers({
+        loading,
+        error,
+    }),
 });

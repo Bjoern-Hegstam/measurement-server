@@ -1,6 +1,8 @@
 dataSourceFactory:
-  driverClass: org.h2.Driver
-  url: jdbc:h2:mem:testing;DB_CLOSE_DELAY=-1
+  driverClass: org.postgresql.Driver
+  url: jdbc:postgresql://localhost:5432/measurement_test_db
+  user: dev
+  password: dev
   validationQuery: "SELECT 1"
   validationQueryTimeout: 3s
 
