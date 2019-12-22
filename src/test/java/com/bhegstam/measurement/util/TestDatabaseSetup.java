@@ -37,8 +37,8 @@ public class TestDatabaseSetup implements BeforeEachCallback, TestInstancePostPr
     );
 
     private final ManagedDataSource dataSource;
-    private Jdbi jdbi;
-    private MeasurementRepository measurementRepository;
+    private final Jdbi jdbi;
+    private final MeasurementRepository measurementRepository;
 
     public TestDatabaseSetup() {
         this(null);
@@ -49,7 +49,7 @@ public class TestDatabaseSetup implements BeforeEachCallback, TestInstancePostPr
             config = loadConfiguration();
         }
 
-        Environment environment = new Environment("test-env", Jackson.newObjectMapper(), null, new MetricRegistry(), null);
+        Environment environment = new Environment("test-env");
 
         new DbMigrationBundle().run(config, environment);
 
