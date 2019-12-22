@@ -5,9 +5,11 @@ A simple server for storing and retrieving generic measurements. Serves a simple
 1. `export APP_VERSION=<APP_VERSION>`
 2. `git branch release-$APP_VERSION`
 3. `sed -i s/1.0-SNAPSHOT/$APP_VERSION/g pom.xml`
-4. `git commit -m $APP_VERSION`
-5. `git tag -a $APP_VERSION -m $APP_VERSION`
-6. `git push --follow-tags`
+4. Update CHANGELOG
+5. `git commit -m $APP_VERSION`
+6. `git tag -a $APP_VERSION`
+7. Copy CHANGELOG entry to tag description
+8. `git push --follow-tags`
 
 ## Build
 1. `export APP_VERSION=<APP_VERSION>`
